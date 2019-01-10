@@ -1,0 +1,15 @@
+
+{
+  "extends": "parcellab",
+  "env": {
+    "browser": true,
+    "node": true,
+    "meteor": true,
+    "es6": true,
+    "mocha": true
+  },
+  "globals": {},
+  "rules": {
+    "no-trailing-spaces": 0
+  }
+}
