@@ -1,5 +1,3 @@
-import { cpus } from 'os';
-
 const os = require('os')
 const _ = require('underscore')
 const graylog2 = require('graylog2')
