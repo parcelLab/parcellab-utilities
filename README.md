@@ -1,0 +1,45 @@
+# parcellab-utilities 
+npm package for shared functionality
+
+**install:** `npm i --save parcellab/parcellab-utilities`
+
+## logger
+
+### import
+```javascript
+const logToConsole = require('parcellab-utilities').logToConsole
+const logger = require('parcellab-utilities').logger
+```
+*or*
+```javascript
+import { logToConsole, logger } from 'parcellab-utilities'
+```
+### config
+environment variables
+```bash
+LOG_LEVEL=DEBUG
+LOG_HOST=127.128.129.130
+LOG_PORT=12345
+LOG_LOCAL=1
+PRODUCTION=0
+```
+at runtime
+```javascript
+logger.settings.defaultSender = 'nameOfSomeScript'
+logger.settings.verboseLocal = true // include extra object data in output
+logger.settings.host = '8.8.8.8'
+(...)
+```
+
+### use
+```javascript
+// syntax: logger.level(message, [ extra, [ sender]])
+logger.debug('>>', { data: [1,0,1,1,0], msgLong: 'a bit has shifted!' })
+logger.info('this message is really informative')
+logger.warn('something is smoking', null, 'smokeAlert') // custom sender
+logger.error('grab your towels and panic: ', err)
+```
+*or*
+```javascript
+logToConsole(level, sender, message, extra)
+```
