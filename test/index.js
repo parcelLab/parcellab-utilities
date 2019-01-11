@@ -2,6 +2,7 @@ import * as assert from 'assert'
 
 import { logToConsole, logger } from '../src/index'
 
+
 describe('<== logger ==>', () => {
   describe('[basic use]', () => {
     it('⚠️  this testsuite does not cover production remote logging', () => {
@@ -10,10 +11,11 @@ describe('<== logger ==>', () => {
       assert.strictEqual(logger.debug('this wont go anywhere'),undefined)
     })
     it('the following should log something', () => {
+      logger.settings.color = true
       logger.settings.developer_mode = true
       assert.ok(true)
     })
-    it('without throwing up', () => {
+    it('in color! without throwing up!', () => {
       assert.strictEqual(
         logToConsole('warn', 'warner brother', 'shrt wrn', { msgLong: { text: 'really super ultra mega extremely long warning log message' } }),
         undefined)
@@ -64,11 +66,11 @@ describe('<== logger ==>', () => {
         logToConsole({ objetc: 'what' }) },
       TypeError)
     })
-    describe('[what does the logger look like?]', function () {
-      it('aha!', function () {
-        logger.settings.verboseLocal = true
-        assert.strictEqual(logger.initGraylog(), undefined)
-      })
+  })
+  describe('[what does the logger look like?]', function () {
+    it('aha!', function () {
+      logger.settings.verboseLocal = true
+      assert.strictEqual(logger.initGraylog(), undefined)
     })
   })
 })

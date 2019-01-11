@@ -15,18 +15,20 @@ const logger = require('parcellab-utilities').logger
 import { logToConsole, logger } from 'parcellab-utilities'
 ```
 ### config
-environment variables
+with environment variables
 ```bash
 LOG_LEVEL=DEBUG
 LOG_HOST=127.128.129.130
 LOG_PORT=12345
 LOG_LOCAL=1
+LOG_COLOR=1
 PRODUCTION=0
 ```
-at runtime
+and/or at runtime
 ```javascript
 logger.settings.defaultSender = 'nameOfSomeScript'
 logger.settings.verboseLocal = true // include extra object data in output
+logger.settings.color = true // colorize local log output
 logger.settings.host = '8.8.8.8'
 (...)
 ```
