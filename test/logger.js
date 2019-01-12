@@ -70,6 +70,7 @@ export default function () {
       it('aha!', function () {
         logger.settings.verboseLocal = true
         assert.strictEqual(logger.initGraylog(), undefined)
+        logger.settings.level = 'DEBUG' // full logging for following tests
       })
     })
   })
