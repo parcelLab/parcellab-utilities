@@ -7,6 +7,8 @@ export default function () {
       it('⚠️  this testsuite does not cover production remote logging', () => {
         logger.settings.level = 'DEBUG'
         logger.settings.developer_mode = false
+        logger.settings.verboseLocal = false
+        logger.settings.color = false
         assert.strictEqual(logger.debug('this wont go anywhere'),undefined)
       })
       it('the following should log something', () => {

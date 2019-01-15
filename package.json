@@ -1,7 +1,7 @@
 {
   "name": "parcellab-utilities",
   "version": "1.0.0",
-  "description": "",
+  "description": "parcellab DRY code",
   "main": "index.js",
   "scripts": {
     "test": "nyc mocha --require babel-core/register",
