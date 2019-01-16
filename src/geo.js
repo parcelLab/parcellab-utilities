@@ -23,13 +23,15 @@ function resolveCountryToISO(countryInfo, digits) {
       c = Country.ISOcodes(ci, 'name')
     } 
   } catch (e) { // actually could not find a way to make it throw...
+    /* istanbul ignore next */
     logger.warn('caught exception', e, 'resolveCountryToISO')
+    /* istanbul ignore next */
     return null
   }
 
   if (!c) return null
   if (digits === 2) return c.alpha2
-  if (digits === 3) return c.alpha3
+  return c.alpha3
 }
 
 

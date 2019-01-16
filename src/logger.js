@@ -1,5 +1,6 @@
 const os = require('os')
 const _ = require('underscore')
+const request = require('request')
 const graylog2 = require('graylog2')
 const Graylog = graylog2.graylog
 
@@ -13,12 +14,13 @@ const logger = {
     developer_mode: !process.env.PRODUCTION,
     defaultSender:  undefined,
     verboseLocal:   false,
+    slackHook:      process.env.LOG_SLACK_HOOK || null,
   },
   graylogger: null,
 }
 
 // order is important! (severe ==> verbose)
-const logLevels = ['ERROR', 'WARN', 'INFO', 'DEBUG']
+const logLevels = ['CRITICAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE']
 
 const colors = {
   Reset: '\x1b[0m',
@@ -52,10 +54,12 @@ const colors = {
 const colorconf = {
   'timestamp': colors.Dim + colors.FgBlack + colors.BgWhite,
   'level': {
-    'DEBUG': colors.Dim + colors.FgBlack + colors.BgWhite,
+    'TRACE': colors.Dim + colors.BgMagenta + colors.FgMagenta,
+    'DEBUG': colors.Dim + colors.FgBlack + colors.BgGreen,
     'INFO': colors.FgBlue + colors.BgCyan,
     'WARN': colors.Bright + colors.FgYellow + colors.BgBlack +  ' ⚠️ ',
     'ERROR': colors.Bright + colors.FgRed + colors.BgBlack + ' ❌',
+    'CRITICAL': colors.Bright + colors.BgRed + colors.FgYellow + colors.Blink + ' ☠️ ',
   },
   'sender': colors.Underscore + colors.FgCyan,
   'extra': colors.FgWhite + colors.BgBlue,
@@ -112,6 +116,22 @@ function logLocal(type, sender, msgShort, msgLong, extras) {
   } 
 }
 
+function slackPost(sender, msgShort) {
+  if (!logger.settings.slackHook) {
+    logToConsole('ERROR', 'slackIntegration', ' 🧨🧨🧨 Cannot post CRITICAL to slack!! No haz webhook!!🧨🧨🧨 ')
+    return false
+  }
+  let msg = os.hostname() + ': <' + sender + '> ' + msgShort
+  request.post(
+    logger.settings.slackHook, {
+      form: `{"text": "${msg}",}`,
+    }, 
+    function (err, response, body) {
+      if (err) logger.error(err, err, 'slackIntegration')
+      if (!err) { logger.info('reponse from webhook: ', { response: response, body: body }, 'slackIntegration') }
+    })
+}
+
 /**
  * logs to console with timestamp
  * @param  {String} type type of message
@@ -149,6 +169,9 @@ function logToConsole(type, sender, msgShort, _extras) {
     } catch (e) {
       logLocal('error', 'logger', 'trying to log something illegal? msgShort: ' + msgShort + ' msgLong: ' + msgLong + ' extras: ' + extras + ' orig msg: ' + e, false, { extras: extras, error: e })
     }
+    if (type === 'CRITICAL') {
+      slackPost(sender, msgShort)
+    }
   }
 
   if (logger.settings.developer_mode || logger.settings.saveLocal) {
@@ -161,10 +184,12 @@ function loggerPassToConsole(type, sender, msg, extra) {
   logToConsole(type, sender, msg, extra)
 }
 
+logger.critical = (msg, extra, sender) => loggerPassToConsole('CRITICAL', sender, msg, extra)
 logger.error = (msg, extra, sender) => loggerPassToConsole('ERROR', sender, msg, extra)
 logger.warn = (msg, extra, sender) => loggerPassToConsole('WARN', sender, msg, extra)
 logger.info = (msg, extra, sender) => loggerPassToConsole('INFO', sender, msg, extra)
 logger.debug = (msg, extra, sender) => loggerPassToConsole('DEBUG', sender, msg, extra)
+logger.trace = (msg, extra, sender) => loggerPassToConsole('TRACE', sender, msg, extra)
 
 
 export { 

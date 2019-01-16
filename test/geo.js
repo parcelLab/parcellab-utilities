@@ -48,6 +48,9 @@ export default function () {
       it('new Error() => null', function () {
         assert.strictEqual(resolveCountryToISO3(new Error()), null)
       })
+      it('null => null', function () {
+        assert.strictEqual(resolveCountryToISO3(null), null)
+      })
     })
     describe('[resolveCountryToISO2]', function () {
       it('Deutschland => DE', function () {
@@ -68,20 +71,20 @@ export default function () {
       it('new Error() => null', function () {
         assert.strictEqual(resolveCountryToISO2(new Error()), null)
 
+        /* I tried more to trip the fkt but it seems pretty resistant
         logger.info(' ' +
-        resolveCountryToISO2('@3') +
-        resolveCountryToISO2('💣') +
-        resolveCountryToISO2('@§') +
+          resolveCountryToISO2('@3') +
+          resolveCountryToISO2('💣') +
+          resolveCountryToISO2('@§') +
           resolveCountryToISO2('200') +
           resolveCountryToISO2('-44') +
           resolveCountryToISO2('+!') +
           resolveCountryToISO2([2, 3]) +
-        resolveCountryToISO2({der: 'sepp'}) +
-        resolveCountryToISO2({ der: 'sepp' }) +
-        resolveCountryToISO2( [null, undefined]) +
-        resolveCountryToISO2([1,2,3,4])
-      )
-        
+          resolveCountryToISO2({der: 'sepp'}) +
+          resolveCountryToISO2({ der: 'sepp' }) +
+          resolveCountryToISO2([null, undefined]) +
+          resolveCountryToISO2([1,2,3,4]))
+          */
       })
     })
   })
