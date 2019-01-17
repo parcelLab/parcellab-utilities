@@ -1,58 +1,87 @@
 import * as assert from 'assert'
 import { resolveCountryToISO2, resolveCountryToISO3 } from '../src/index'
-import { logger } from '../src/logger'
+// import { logger } from '../src/logger'
 
-logger.settings.development_mode = true
-logger.settings.color = true
-logger.settings.verboseLocal = true
-logger.settings.level = 'DEBUG'
-logger.settings.host = 'lalala'
+// logger.settings.development_mode = true
+// logger.settings.color = true
+// logger.settings.verboseLocal = true
+// logger.settings.level = 'DEBUG'
+// logger.settings.host = 'lalala'
 
 export default function () {
+
+  let testsISO3 = [
+    ['Deutschland', 'DEU'],
+    ['deutschland', 'DEU'],
+    ['DEUTSCHLAND', 'DEU'],
+    ['DEU', 'DEU'],
+    ['DE', 'DEU'],
+    ['SCHLAND', null],
+    ['Österreich', 'AUT'],
+    ['oEsterreich', 'AUT'],
+    ['Schweiz', 'CHE'],
+    ['München', null],
+    ['Allemania', null],
+    ['Britannien', null],
+    [42, null],
+    [new Error('what?'), null],
+    [null, null],
+    ['the united sTaTEs of aMerica', 'USA'],
+    ['republik bulgarien', 'BGR'],
+    ['REPUBLIK BULGARIEN', 'BGR'],
+    ['united kingDom', 'GBR'],
+  ]
+
+  let testsISO2 = [
+    ['Deutschland', 'DE'],
+    ['deutschland', 'DE'],
+    ['DEUTSCHLAND', 'DE'],
+    ['SCHLAND', null],
+    ['Österreich', 'AT'],
+    ['oEsterreich', 'AT'],
+    ['Schweiz', 'CH'],
+    ['München', null],
+    ['Allemania', null],
+    ['Britannien', null],
+    [42, null],
+    [new Error('what?'), null],
+    [null, null],
+    ['united kingDom', 'GB'],
+    ['D', 'DE'],
+    ['A', 'AT'],
+    ['america', 'US'],
+    [[234,214,345], null],
+    [[1312123,() => 2938123], null],
+  ]
+
+  const testFuncISO3 = (test) => {
+    assert.strictEqual(resolveCountryToISO3(test[0]), test[1])
+    // console.log(test)
+  }
+
+  const testFuncISO2 = (test) => {
+    assert.strictEqual(resolveCountryToISO2(test[0]), test[1])
+  }
   
   describe('<== geo ==>', () => {
     describe('[resolveCountryToISO3]', () => {
-      it('Deutschland => DEU', function () {
-        assert.strictEqual(resolveCountryToISO3('Deutschland'), 'DEU')
-      })
-      it('deutschland => DEU', function () {
-        assert.strictEqual(resolveCountryToISO3('deutschland'), 'DEU')
-      })
-      it('Österreich => AUT', function () {
-        assert.strictEqual(resolveCountryToISO3('Österreich'), 'AUT')
-      })
-      it('Oesterreich => AUT', function () {
-        assert.strictEqual(resolveCountryToISO3('Oesterreich'), 'AUT')
-      })
-      it('Schweiz => CHE', function () {
-        assert.strictEqual(resolveCountryToISO3('Schweiz'), 'CHE')
-      })
-      it('München => null', function () {
-        assert.strictEqual(resolveCountryToISO3('München'), null)
-      })
-      it('Allemania => DEU', function () {
-        assert.strictEqual(resolveCountryToISO3('Allemania'), null)
-      })
-      it('Germanien => DEU', function () {
-        assert.strictEqual(resolveCountryToISO3('Germanien'), null)
-      })
-      it('Deutchland => null', function () {
-        assert.strictEqual(resolveCountryToISO3('Deutchland'), null)
-      })
-      it('Deutschlan => null', function () {
-        assert.strictEqual(resolveCountryToISO3('Deutschlan'), null)
-      })
-      it('42 => null', function () {
-        assert.strictEqual(resolveCountryToISO3(42), null)
-      })
-      it('new Error() => null', function () {
-        assert.strictEqual(resolveCountryToISO3(new Error()), null)
-      })
-      it('null => null', function () {
-        assert.strictEqual(resolveCountryToISO3(null), null)
-      })
+
+      let i = -1
+      let test
+      while (testsISO3[++i]) {
+        test = testsISO3[i]
+        it(test[0] + ' => ' + test[1], testFuncISO3.bind(null, test))
+      }
     })
     describe('[resolveCountryToISO2]', function () {
+
+      let i = -1
+      let test
+      while (testsISO2[++i]) {
+        test = testsISO2[i]
+        it(test[0] + ' => ' + test[1], testFuncISO2.bind(null, test))
+      }
+      /*
       it('Deutschland => DE', function () {
         assert.strictEqual(resolveCountryToISO2('Deutschland'), 'DE')
       })
@@ -71,6 +100,8 @@ export default function () {
       it('new Error() => null', function () {
         assert.strictEqual(resolveCountryToISO2(new Error()), null)
 
+      */
+
         /* I tried more to trip the fkt but it seems pretty resistant
         logger.info(' ' +
           resolveCountryToISO2('@3') +
@@ -85,7 +116,6 @@ export default function () {
           resolveCountryToISO2([null, undefined]) +
           resolveCountryToISO2([1,2,3,4]))
           */
-      })
     })
   })
 }

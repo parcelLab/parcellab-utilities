@@ -94,6 +94,3 @@ export default function () {
     })
   })
 }
-
-/// TODO README
-// tests
