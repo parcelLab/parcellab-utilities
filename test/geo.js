@@ -1,12 +1,6 @@
 import * as assert from 'assert'
 import { resolveCountryToISO2, resolveCountryToISO3 } from '../src/index'
-// import { logger } from '../src/logger'
 
-// logger.settings.development_mode = true
-// logger.settings.color = true
-// logger.settings.verboseLocal = true
-// logger.settings.level = 'DEBUG'
-// logger.settings.host = 'lalala'
 
 export default function () {
 
@@ -14,12 +8,20 @@ export default function () {
     ['Deutschland', 'DEU'],
     ['deutschland', 'DEU'],
     ['DEUTSCHLAND', 'DEU'],
+    ['Germany', 'DEU'],
     ['DEU', 'DEU'],
     ['DE', 'DEU'],
     ['SCHLAND', null],
     ['Österreich', 'AUT'],
     ['oEsterreich', 'AUT'],
     ['Schweiz', 'CHE'],
+    ['France', 'FRA'],
+    ['Frankreich', 'FRA'],
+    ['España', 'ESP'],
+    ['Espana', 'ESP'],
+    ['Spain', 'ESP'],
+    ['Spanien', 'ESP'],
+    ['アメリカ合衆国', 'USA'],
     ['München', null],
     ['Allemania', null],
     ['Britannien', null],
@@ -81,41 +83,21 @@ export default function () {
         test = testsISO2[i]
         it(test[0] + ' => ' + test[1], testFuncISO2.bind(null, test))
       }
-      /*
-      it('Deutschland => DE', function () {
-        assert.strictEqual(resolveCountryToISO2('Deutschland'), 'DE')
-      })
-      it('De => DE', function () {
-        assert.strictEqual(resolveCountryToISO2('De'), 'DE')
-      })
-      it('Deu => DE', function () {
-        assert.strictEqual(resolveCountryToISO2('Deu'), 'DE')
-      })
-      it('xyz => null', function () {
-        assert.strictEqual(resolveCountryToISO2('xyz'), null)
-      })
-      it('42 => null', function () {
-        assert.strictEqual(resolveCountryToISO2(42), null)
-      })
-      it('new Error() => null', function () {
-        assert.strictEqual(resolveCountryToISO2(new Error()), null)
 
-      */
-
-        /* I tried more to trip the fkt but it seems pretty resistant
-        logger.info(' ' +
-          resolveCountryToISO2('@3') +
-          resolveCountryToISO2('💣') +
-          resolveCountryToISO2('@§') +
-          resolveCountryToISO2('200') +
-          resolveCountryToISO2('-44') +
-          resolveCountryToISO2('+!') +
-          resolveCountryToISO2([2, 3]) +
-          resolveCountryToISO2({der: 'sepp'}) +
-          resolveCountryToISO2({ der: 'sepp' }) +
-          resolveCountryToISO2([null, undefined]) +
-          resolveCountryToISO2([1,2,3,4]))
-          */
+      /* I tried more to trip the fkt but it seems pretty resistant
+      logger.info(' ' +
+        resolveCountryToISO2('@3') +
+        resolveCountryToISO2('💣') +
+        resolveCountryToISO2('@§') +
+        resolveCountryToISO2('200') +
+        resolveCountryToISO2('-44') +
+        resolveCountryToISO2('+!') +
+        resolveCountryToISO2([2, 3]) +
+        resolveCountryToISO2({der: 'sepp'}) +
+        resolveCountryToISO2({ der: 'sepp' }) +
+        resolveCountryToISO2([null, undefined]) +
+        resolveCountryToISO2([1,2,3,4]))
+        */
     })
   })
 }
