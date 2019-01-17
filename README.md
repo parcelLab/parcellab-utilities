@@ -36,12 +36,30 @@ logger.settings.host = '8.8.8.8'
 ### use
 ```javascript
 // syntax: logger.level(message, [ extra, [ sender]])
-logger.debug('>>', { data: [1,0,1,1,0], msgLong: 'a bit has shifted!' })
+logger.trace('>>', { data: [1,0,1,1,0], msgLong: 'a bit has shifted!' })
+logger.debug('invoking some procedure', obj )
 logger.info('this message is really informative')
 logger.warn('something is smoking', null, 'smokeAlert') // custom sender
 logger.error('grab your towels and panic: ', err)
+logger.critical('hello slack! you should really do something about this NOW', err, 'importantFkt')
 ```
 *or*
 ```javascript
 logToConsole(level, sender, message, extra)
 ```
+
+## geo
+
+### import
+```javascript
+const resolveCountryToISO3 = require('parcellab-utilities').resolveCountryToISO3
+```
+*or*
+```javascript
+import { resolveCountryToISO3 } from 'parcellab-utilities'
+```
+
+### use
+`resolveCountryToISO3('Spain')` `// returns 'ESP'`
+
+it takes strings or anything, don't expect miracles. The underlying lib `countryjs` recognizes some translations - English or German country names should be a pretty safe bet
