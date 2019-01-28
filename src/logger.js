@@ -101,7 +101,7 @@ function checkType(type) {
 }
 
 function logThis(type) {
-  return logLevels.indexOf(logger.settings.level) >= logLevels.indexOf(type)
+  return logLevels.indexOf(logger.settings.level.toUpperCase()) >= logLevels.indexOf(type)
 }
 
 function logLocal(type, sender, msgShort, msgLong, extras) {
