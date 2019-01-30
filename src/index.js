@@ -1,9 +1,9 @@
-import { logToConsole, logger } from './logger'
+import { logToConsole, Logger } from './logger'
 import { resolveCountryToISO2, resolveCountryToISO3 } from './geo'
 
 module.exports = {
   logToConsole,
-  logger,
+  Logger,
   resolveCountryToISO2,
   resolveCountryToISO3,
 }

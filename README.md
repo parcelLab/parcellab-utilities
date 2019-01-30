@@ -8,11 +8,12 @@ npm package for shared functionality
 ### import
 ```javascript
 const logToConsole = require('parcellab-utilities').logToConsole
-const logger = require('parcellab-utilities').logger
+const logger = require('parcellab-utilities').Logger.for('yourScriptName')
 ```
 *or*
 ```javascript
-import { logToConsole, logger } from 'parcellab-utilities'
+import { logToConsole, Logger } from 'parcellab-utilities'
+const logger = Logger.for('yourScriptName') 
 ```
 ### config
 with environment variables
@@ -26,12 +27,13 @@ PRODUCTION=0
 ```
 and/or at runtime
 ```javascript
-logger.settings.defaultSender = 'nameOfSomeScript'
-logger.settings.verboseLocal = true // include extra object data in output
-logger.settings.color = true // colorize local log output
-logger.settings.host = '8.8.8.8'
+Logger.settings.defaultSender = 'nameOfSomeScript'
+Logger.settings.verboseLocal = true // include extra object data in output
+Logger.settings.color = true // colorize local log output
+Logger.settings.host = '8.8.8.8'
 (...)
 ```
+_**NOTE:&** Logger is a **singleton** so change to the settings can affect logging of other modules._
 
 ### use
 ```javascript
@@ -39,7 +41,7 @@ logger.settings.host = '8.8.8.8'
 logger.trace('>>', { data: [1,0,1,1,0], msgLong: 'a bit has shifted!' })
 logger.debug('invoking some procedure', obj )
 logger.info('this message is really informative')
-logger.warn('something is smoking', null, 'smokeAlert') // custom sender
+logger.warn('something is smoking', null, 'smokeAlertSender') // custom sender
 logger.error('grab your towels and panic: ', err)
 logger.critical('hello slack! you should really do something about this NOW', err, 'importantFkt')
 ```

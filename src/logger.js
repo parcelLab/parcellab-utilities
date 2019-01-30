@@ -22,6 +22,35 @@ const logger = {
 // order is important! (severe ==> verbose)
 const logLevels = ['CRITICAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE']
 
+
+//to enable logger instances have a default sender - shit's mainly singletonic otherwise
+class Logger { 
+  constructor(defaultSender) {
+    this.defaultSender = defaultSender
+  }
+
+  critical(msg, extra, sender) { this.loggerPassToConsole('CRITICAL', sender, msg, extra) }
+  error(msg, extra, sender) { this.loggerPassToConsole('ERROR', sender, msg, extra) }
+  warn(msg, extra, sender) { this.loggerPassToConsole('WARN', sender, msg, extra) }
+  info(msg, extra, sender) { this.loggerPassToConsole('INFO', sender, msg, extra) }
+  debug(msg, extra, sender) { this.loggerPassToConsole('DEBUG', sender, msg, extra) }
+  trace(msg, extra, sender) { this.loggerPassToConsole('TRACE', sender, msg, extra) }
+
+  loggerPassToConsole(type, sender, msg, extra) {
+    sender = sender || this.defaultSender || logger.settings.defaultSender || 'unknown sender'
+    logToConsole(type, sender, msg, extra)
+  }
+}
+const defaultLogger = new Logger()
+
+logger.for = (sender) => {
+  return new Logger(sender)
+}
+logger.get = () => {
+  return defaultLogger
+}
+
+
 const colors = {
   Reset: '\x1b[0m',
   Bright: '\x1b[1m',
@@ -89,7 +118,7 @@ logger.initGraylog = function () {
     console.error('Error while trying to write to graylog2:', error)
   })
   logger.graylogger = graylogger
-  logger.info('Connection to Graylog log Server initialized', null, 'logger.initGraylog')
+  logToConsole('INFO', 'logger.initGraylog', 'Connection to Graylog log Server initialized')
   if (logger.settings.verboseLocal) console.log(logger)
 }
 
@@ -128,7 +157,7 @@ function slackPost(sender, msgShort) {
     }, 
     function (err, response, body) {
       /* istanbul ignore else */ // testing that spams the slack channel..
-      if (err) logger.error(err, err, 'slackIntegration')
+      if (err) logToConsole('ERROR', 'slackIntegration', ' 🧨🧨🧨 posting to slack failed! 🧨🧨🧨', err)
       else if (!err) { logger.info('reponse from webhook: ', { response: response, body: body }, 'slackIntegration') }
     })
 }
@@ -180,20 +209,8 @@ function logToConsole(type, sender, msgShort, _extras) {
   }
 }
 
-function loggerPassToConsole(type, sender, msg, extra) {
-  sender = sender || logger.settings.defaultSender || 'unknown sender'
-  logToConsole(type, sender, msg, extra)
-}
-
-logger.critical = (msg, extra, sender) => loggerPassToConsole('CRITICAL', sender, msg, extra)
-logger.error = (msg, extra, sender) => loggerPassToConsole('ERROR', sender, msg, extra)
-logger.warn = (msg, extra, sender) => loggerPassToConsole('WARN', sender, msg, extra)
-logger.info = (msg, extra, sender) => loggerPassToConsole('INFO', sender, msg, extra)
-logger.debug = (msg, extra, sender) => loggerPassToConsole('DEBUG', sender, msg, extra)
-logger.trace = (msg, extra, sender) => loggerPassToConsole('TRACE', sender, msg, extra)
-
 
 export { 
   logToConsole,
-  logger,
+  logger as Logger,
 }
