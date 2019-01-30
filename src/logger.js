@@ -158,7 +158,7 @@ function slackPost(sender, msgShort) {
     function (err, response, body) {
       /* istanbul ignore else */ // testing that spams the slack channel..
       if (err) logToConsole('ERROR', 'slackIntegration', ' 🧨🧨🧨 posting to slack failed! 🧨🧨🧨', err)
-      else if (!err) { logger.info('reponse from webhook: ', { response: response, body: body }, 'slackIntegration') }
+      else if (!err) { logToConsole('INFO', 'slackIntegration', 'response from webhook: ', { response: response, body: body }) }
     })
 }
 
