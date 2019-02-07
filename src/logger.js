@@ -4,16 +4,18 @@ const request = require('request')
 const graylog2 = require('graylog2')
 const Graylog = graylog2.graylog
 
+import { isTrue, isProductionEnv } from './util'
+
 const logger = {
   settings: {
     level:          process.env.LOG_LEVEL || 'DEBUG',
     host:           process.env.LOG_HOST || '127.0.0.1',
     port:           process.env.LOG_PORT || null,
-    saveLocal:      process.env.LOG_LOCAL || false,
-    color:          process.env.LOG_COLOR || false,
-    developer_mode: !process.env.PRODUCTION,
+    saveLocal:      isTrue(process.env.LOG_LOCAL),
+    color:          isTrue(process.env.LOG_COLOR),
+    developer_mode: !isProductionEnv(),
     defaultSender:  undefined,
-    verboseLocal:   false,
+    verboseLocal:   isTrue(process.env.LOG_EXTRA),
     slackHook:      process.env.LOG_SLACK_HOOK || null,
   },
   graylogger: null,
@@ -113,13 +115,14 @@ logger.initGraylog = function () {
   options.servers.push(server1)
 
   let graylogger = new Graylog(options)
+
   /* istanbul ignore next */
   graylogger.on('error', function (error) {
     console.error('Error while trying to write to graylog2:', error)
   })
   logger.graylogger = graylogger
-  logToConsole('INFO', 'logger.initGraylog', 'Connection to Graylog log Server initialized')
-  if (logger.settings.verboseLocal) console.log(logger)
+  logToConsole('INFO', 'logger.initGraylog', 'Connection to Graylog log Server initialized', options)
+  //if (logger.settings.verboseLocal) console.log(logger)
 }
 
 function checkType(type) {
