@@ -12,10 +12,11 @@ const logger = {
     host:           process.env.LOG_HOST || '127.0.0.1',
     port:           process.env.LOG_PORT || null,
     saveLocal:      isTrue(process.env.LOG_LOCAL),
+    timestampLocal: isTrue(process.env.LOG_TIMESTAMP),
+    verboseLocal: isTrue(process.env.LOG_EXTRA),
     color:          isTrue(process.env.LOG_COLOR),
     developer_mode: !isProductionEnv(),
-    defaultSender:  undefined,
-    verboseLocal:   isTrue(process.env.LOG_EXTRA),
+    // defaultSender:  undefined,
     slackHook:      process.env.LOG_SLACK_HOOK || null,
   },
   graylogger: null,
@@ -85,7 +86,7 @@ const colors = {
 const colorconf = {
   'timestamp': colors.Dim + colors.FgBlack + colors.BgWhite,
   'level': {
-    'TRACE': colors.Dim + colors.BgMagenta + colors.FgMagenta,
+    'TRACE': colors.Dim + colors.BgMagenta + colors.FgBlack,
     'DEBUG': colors.Dim + colors.FgBlack + colors.BgGreen,
     'INFO': colors.FgBlue + colors.BgCyan,
     'WARN': colors.Bright + colors.FgYellow + colors.BgBlack +  ' ⚠️ ',
@@ -138,7 +139,8 @@ function logThis(type) {
 
 function logLocal(type, sender, msgShort, msgLong, extras) {
   type = type.toUpperCase()
-  let msg = colorize('timestamp', (new Date()).toJSON()) + ' ' + 
+  let msg = (logger.settings.color ? colors.Reset : '') +
+            (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') + 
             colorize('level', type) + '<' + colorize('sender', sender) + '>: '
   msg += msgLong ? msgLong : msgShort
   if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)

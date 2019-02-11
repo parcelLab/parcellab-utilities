@@ -15,6 +15,7 @@ export default function () {
       it('the following should log something', () => {
         Logger.settings.color = true
         Logger.settings.developer_mode = true
+        Logger.settings.timestampLocal = true
         assert.ok(true)
       })
       it('in color! without throwing up!', () => {
@@ -37,6 +38,7 @@ export default function () {
           logToConsole('error', 'terror', 'this is not a test', { really: 'just kidding' }),
           undefined)
         Logger.settings.verboseLocal = false
+        Logger.settings.timestampLocal = false
       })
       it('should adhere the defaultSender setting', function () {
         Logger.settings.defaultSender = 'iAmTheDefaultSender!'
