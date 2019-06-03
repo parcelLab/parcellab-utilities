@@ -143,8 +143,9 @@ function logLocal(type, sender, msgShort, msgLong, extras) {
             (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') + 
             colorize('level', type) + '<' + colorize('sender', sender) + '>: '
   msg += msgLong ? msgLong : msgShort
-  if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
-  else console.log(msg)
+  //if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
+  //else 
+  console.log(msg)
   if (logger.settings.verboseLocal && _.isObject(extras)) {
     console.log(colorize('extra', '↳extras:'), extras)
   } 
