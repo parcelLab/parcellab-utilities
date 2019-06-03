@@ -41,10 +41,12 @@ export default function () {
         Logger.settings.timestampLocal = false
       })
       it('should adhere the defaultSender setting', function () {
+        Logger.settings.color = false
         Logger.settings.defaultSender = 'iAmTheDefaultSender!'
         assert.strictEqual(
           logger.debug('where is my default message?'),
           undefined)
+        Logger.settings.color = true
       })
       it('or fall back to the default string', function () {
         Logger.settings.defaultSender = null
@@ -82,17 +84,26 @@ export default function () {
           undefined)
       })
       it('or with error', function () {
+        
         assert.throws(function () {
           logToConsole({ objetc: 'what' }) },
         TypeError)
+        // Logger.settings.port = port
       })
     })
-    describe('[what does the logger look like?]', function () {
-      it('aha!', function () {
+    describe('[if graylog gets crap config]', function () {
+      it('it should puke up on you', function () {
         Logger.settings.verboseLocal = true
-        assert.strictEqual(Logger.initGraylog(), undefined)
+        Logger.settings.developer_mode = false
+        let port = Logger.settings.port
+        Logger.settings.port = null
+        assert.strictEqual((() => {
+          Logger.initGraylog()
+          logToConsole('error', 'graylog', 'this should raise an error')
+        })(), undefined)
         Logger.settings.level = 'DEBUG' // decent logging for following tests
         Logger.settings.verboseLocal = false // but dont overdo
+        Logger.settings.developer_mode = true
       })
     })
     describe('[loggers should locally scope their own defaultSender]', function () {
