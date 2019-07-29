@@ -16,24 +16,25 @@ import { logToConsole, Logger } from 'parcellab-utilities'
 const logger = Logger.for('yourScriptName') 
 ```
 ### config
-with environment variables
-```bash
-LOG_LEVEL=DEBUG
-LOG_HOST=127.128.129.130
-LOG_PORT=12345
-LOG_LOCAL=1
-LOG_COLOR=1
-PRODUCTION=0
+with environment variables and/or with manipulating the Logger object in js
 ```
-and/or at runtime
-```javascript
-Logger.settings.defaultSender = 'nameOfSomeScript'
-Logger.settings.verboseLocal = true // include extra object data in output
-Logger.settings.color = true // colorize local log output
-Logger.settings.host = '8.8.8.8'
-(...)
+LOG_LEVEL=DEBUG               ||    Logger.settings.level = 'debug' 
+LOG_HOST=127.128.129.130      ||    Logger.settings.host = '127.128.129.130'
+LOG_PORT=12345                ||    Logger.settings.port = '12345'
+LOG_COLOR=1                   ||    Logger.settings.color = true
+LOG_LOCAL=1                   ||    Logger.settings.saveLocal = true
+LOG_EXTRA=1                   ||    Logger.settings.verboseLocal = true
+LOG_TIMESTAMP=1               ||    Logger.settings.timestampLocal = true
+LOG_SLACK_HOOK=httbla         ||    Logger.settings.slackHook = 'httbla'
+PRODUCTION=0                  ||    Logger.settings.developer_mode = true
+
 ```
-_**NOTE:&** Logger is a **singleton** so change to the settings can affect logging of other modules._
+_**⚠️** Logger is a **singleton** so change to the settings can affect logging of other modules._
+
+_**⚠️** Beware of hirarchy:_
+ * javascript settings overrule env var settings.
+ * env vars set in shell will overrule vars in `.env` file parsed by npm module `dotenv`
+
 
 ### use
 ```javascript

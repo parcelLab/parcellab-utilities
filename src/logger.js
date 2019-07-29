@@ -10,7 +10,7 @@ const logger = {
   settings: {
     level:          process.env.LOG_LEVEL || 'DEBUG',
     host:           process.env.LOG_HOST || '127.0.0.1',
-    port:           process.env.LOG_PORT || null,
+    port:           process.env.LOG_PORT || 54321,
     saveLocal:      isTrue(process.env.LOG_LOCAL),
     timestampLocal: isTrue(process.env.LOG_TIMESTAMP),
     verboseLocal: isTrue(process.env.LOG_EXTRA),
@@ -119,7 +119,7 @@ logger.initGraylog = function () {
 
   /* istanbul ignore next */
   graylogger.on('error', function (error) {
-    console.error('Error while trying to write to graylog2:', error)
+    console.log(' 👾 !ERROR! while trying to write to graylog2:', error)
   })
   logger.graylogger = graylogger
   logToConsole('INFO', 'logger.initGraylog', 'Connection to Graylog log Server initialized', options)
@@ -143,8 +143,9 @@ function logLocal(type, sender, msgShort, msgLong, extras) {
             (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') + 
             colorize('level', type) + '<' + colorize('sender', sender) + '>: '
   msg += msgLong ? msgLong : msgShort
-  if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
-  else console.log(msg)
+  //if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
+  //else 
+  console.log(msg)
   if (logger.settings.verboseLocal && _.isObject(extras)) {
     console.log(colorize('extra', '↳extras:'), extras)
   } 
