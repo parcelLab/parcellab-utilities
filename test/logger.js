@@ -64,7 +64,7 @@ export default function () {
       })
       it('but loudly complain when the slack hook is not provided by the env', function () {
         Logger.settings.slackHook = null
-        assert.strictEqual(logger.critical('give me some slack please!'), undefined)
+        assert.strictEqual(logger.critical('give me some slack please!', { user_id: 12, filename: 'test' }), undefined)
       })
       it('and thats what a cricital should look like on the console in dev mode', function () {
         Logger.settings.developer_mode = true

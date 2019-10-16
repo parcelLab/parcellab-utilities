@@ -4,7 +4,7 @@
   "description": "parcellab DRY code",
   "main": "index.js",
   "scripts": {
-    "test": "unset LOG_LEVEL; nyc mocha --require babel-core/register",
+    "test": "unset LOG_LEVEL; nyc mocha --require babel-core/register --exit",
     "build": "babel ./src -d ./lib"
   },
   "repository": {
