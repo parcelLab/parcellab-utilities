@@ -59,6 +59,7 @@ export default function () {
       })
       it('should post on slack  when the level is critical (in production mode)', function () {
         Logger.settings.developer_mode = false
+        Logger.settings.prettyPrint = true
         Logger.settings.slackHook = 'https://phone'
         assert.strictEqual(logger.critical('//phone is actially not a slack hook ', null, 'fakeNews'), undefined)
       })

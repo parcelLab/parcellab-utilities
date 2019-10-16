@@ -13,8 +13,9 @@ const logger = {
     port:           process.env.LOG_PORT || 54321,
     saveLocal:      isTrue(process.env.LOG_LOCAL),
     timestampLocal: isTrue(process.env.LOG_TIMESTAMP),
-    verboseLocal: isTrue(process.env.LOG_EXTRA),
+    verboseLocal:   isTrue(process.env.LOG_EXTRA),
     color:          isTrue(process.env.LOG_COLOR),
+    prettyPrint:    isTrue(process.env.LOG_PRETTY),
     developer_mode: !isProductionEnv(),
     // defaultSender:  undefined,
     slackHook:      process.env.LOG_SLACK_HOOK || null,
@@ -95,6 +96,10 @@ const colorconf = {
   },
   'sender': colors.Underscore + colors.FgCyan,
   'extra': colors.FgWhite + colors.BgBlue,
+}
+function objToString(str) {
+  if (!logger.settings.prettyPrint) return JSON.stringify(str)
+  return JSON.stringify(str, null, 4)
 }
 function colorize(part, str) {
   if (!logger.settings.color) return str
@@ -184,12 +189,12 @@ function logToConsole(type, sender, msgShort, _extras) {
   let extras = {}
   if (_extras) extras = Object.assign({}, _extras)
 
-  if (_.isObject(msgShort)) msgShort = JSON.stringify(msgShort)
+  if (_.isObject(msgShort)) msgShort = objToString(msgShort)
 
   // sender = sender.toUpperCase()
 
   let msgLong = extras.msgLong || _extras
-  if (_.isObject(msgLong)) msgLong = JSON.stringify(msgLong)
+  if (_.isObject(msgLong)) msgLong = objToString(msgLong)
 
   // in production mode send the message to graylog as well.
   if (!logger.settings.developer_mode) {
