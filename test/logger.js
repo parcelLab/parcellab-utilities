@@ -99,7 +99,7 @@ export default function () {
         Logger.settings.port = null
         assert.strictEqual((() => {
           Logger.initGraylog()
-          logToConsole('error', 'graylog', 'this should raise an error')
+          logToConsole('error', 'graylog', 'this should raise an error', { what: 'tehfck' })
         })(), undefined)
         Logger.settings.level = 'DEBUG' // decent logging for following tests
         Logger.settings.verboseLocal = false // but dont overdo

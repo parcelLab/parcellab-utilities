@@ -188,12 +188,8 @@ function logToConsole(type, sender, msgShort, _extras) {
 
   // sender = sender.toUpperCase()
 
-  let msgLong = ''
-  if (extras.msgLong) {
-    msgLong = extras.msgLong
-    if (_.isObject(msgLong)) msgLong = JSON.stringify(msgLong)
-    delete extras.msgLong
-  }
+  let msgLong = extras.msgLong || _extras
+  if (_.isObject(msgLong)) msgLong = JSON.stringify(msgLong)
 
   // in production mode send the message to graylog as well.
   if (!logger.settings.developer_mode) {
