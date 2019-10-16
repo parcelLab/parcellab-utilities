@@ -198,10 +198,17 @@ function logToConsole(type, sender, msgShort, _extras) {
   // in production mode send the message to graylog as well.
   if (!logger.settings.developer_mode) {
     if (logger.graylogger === null) logger.initGraylog()
-    extras.sender = sender
-    extras.type = type
+
+    // smallExtras added because just sending the extras json can lead to trouble with indexing on the graylog server if it's not consistent
+    let smallExtras = {
+      sender: sender,
+      type: type,
+    }
+    if (extras.user_id) smallExtras.user_id = extras.user_id
+    if (extras.filename) smallExtras.filename = extras.filename
+
     try {
-      logger.graylogger.log(msgShort, msgLong, extras)
+      logger.graylogger.log(msgShort, msgLong, smallExtras)
     } catch (e) {
       logLocal('error', 'logger', 'trying to log something illegal? msgShort: ' + msgShort + ' msgLong: ' + msgLong + ' extras: ' + extras + ' orig msg: ' + e, false, { extras: extras, error: e })
     }
