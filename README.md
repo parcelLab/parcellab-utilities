@@ -67,3 +67,16 @@ import { resolveCountryToISO3 } from 'parcellab-utilities'
 `resolveCountryToISO3('Spain')` `// returns 'ESP'`
 
 it takes strings or anything, don't expect miracles. The underlying lib `countryjs` recognizes some translations - English or German country names should be a pretty safe bet
+
+# Making changes to this package
+❗️Never edit the files in `/lib`! They are generated from `/src`.
+
+Make use of `npm test` to see if things still pretend to be alright.
+
+When you have commited changes to the repository here is what needs to be done to make an updated package available (it's easy to forget at least one step:)
+1. `npm run build`
+2. `git commit -a -m 'generated new build'
+3. `npm version patch` or `npm version minor` or `npm version major`
+4. `git push --follow-tags`
+
+or you can simply run `npm run publish` which does these things
