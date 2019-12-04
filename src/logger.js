@@ -147,7 +147,8 @@ function logLocal(type, sender, msgShort, msgLong, extras) {
   let msg = (logger.settings.color ? colors.Reset : '') +
             (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') + 
             colorize('level', type) + '<' + colorize('sender', sender) + '>: '
-  msg += msgLong ? msgLong : msgShort
+  // msg += msgLong ? msgLong : msgShort // nope, msgLong will usually be == extras 
+  msg += msgShort;
   //if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
   //else 
   console.log(msg)
