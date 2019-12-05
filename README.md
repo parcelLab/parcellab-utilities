@@ -75,7 +75,7 @@ Make use of `npm test` to see if things still pretend to be alright.
 
 When you have commited changes to the repository here is what needs to be done to make an updated package available (it's easy to forget at least one step:)
 1. `npm run build`
-2. `git commit -a -m 'generated new build'
+2. `git commit -a -m 'generated new build'`
 3. `npm version patch` or `npm version minor` or `npm version major`
 4. `git push --follow-tags`
 
