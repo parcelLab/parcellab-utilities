@@ -1,6 +1,6 @@
 {
   "name": "parcellab-utilities",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "description": "parcellab DRY code",
   "main": "index.js",
   "scripts": {
