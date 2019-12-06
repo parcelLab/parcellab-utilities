@@ -7,6 +7,7 @@ export default function () {
     describe('[basic use]', () => {
       it('⚠️  this testsuite does not cover production remote logging', () => {
         Logger.settings.level = 'TRACE'
+        Logger.settings.saveLocal = true
         Logger.settings.developer_mode = false
         Logger.settings.verboseLocal = false
         Logger.settings.color = false
