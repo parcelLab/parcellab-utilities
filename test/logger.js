@@ -53,6 +53,12 @@ export default function () {
         Logger.settings.defaultSender = null
         assert.strictEqual(logger.info('hiding in the shadows'), undefined)
       })
+      it('should survive objects with circular references', function () {
+        let obj = {}
+        obj.self = obj
+        assert.strictEqual(logger.warn('this onbect wont stringify well: ', null, 'circulogga'), undefined)
+        assert.strictEqual(logger.info(obj, null, 'circulogga'), undefined)
+      })
       it('should not log above its log level', function () {
         Logger.settings.level = 'ERROR'
         assert.strictEqual(logger.info('bla'), undefined)

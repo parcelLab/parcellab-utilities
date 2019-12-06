@@ -97,9 +97,16 @@ const colorconf = {
   'sender': colors.Underscore + colors.FgCyan,
   'extra': colors.FgWhite + colors.BgBlue,
 }
-function objToString(str) {
-  if (!logger.settings.prettyPrint) return JSON.stringify(str)
-  return JSON.stringify(str, null, 4)
+function objToString(obj) {
+  let str
+  try {
+    if (!logger.settings.prettyPrint) { str = JSON.stringify(obj) }
+    else { str = JSON.stringify(obj, null, 4) }
+  } catch (err) {
+    logToConsole('WARN', 'logger-module', 'stringification of object failed', err)
+    str = '~(Obj)~[un-stringifiable]~~'
+  }
+  return str
 }
 function colorize(part, str) {
   if (!logger.settings.color) return str
