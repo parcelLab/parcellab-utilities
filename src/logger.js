@@ -190,6 +190,8 @@ function logToConsole (type, sender, msgShort, _extras) {
   if (!checkType(type)) return
   if (!logThis(type)) return
 
+  logger.settings.level = logLevels.indexOf(type) + 2
+
   let extras = {}
   if (_extras) extras = Object.assign({}, _extras)
 
