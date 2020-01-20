@@ -1,46 +1,45 @@
+import { isTrue, isProductionEnv } from './util'
+
 const os = require('os')
 const _ = require('underscore')
 const request = require('request')
 const graylog2 = require('graylog2')
 const Graylog = graylog2.graylog
 
-import { isTrue, isProductionEnv } from './util'
-
 const logger = {
   settings: {
-    level:          process.env.LOG_LEVEL || 'DEBUG',
-    host:           process.env.LOG_HOST || '127.0.0.1',
-    port:           process.env.LOG_PORT || 54321,
-    saveLocal:      isTrue(process.env.LOG_LOCAL),
+    level: process.env.LOG_LEVEL || 'DEBUG',
+    host: process.env.LOG_HOST || '127.0.0.1',
+    port: process.env.LOG_PORT || 54321,
+    saveLocal: isTrue(process.env.LOG_LOCAL),
     timestampLocal: isTrue(process.env.LOG_TIMESTAMP),
-    verboseLocal:   isTrue(process.env.LOG_EXTRA),
-    color:          isTrue(process.env.LOG_COLOR),
-    prettyPrint:    isTrue(process.env.LOG_PRETTY),
+    verboseLocal: isTrue(process.env.LOG_EXTRA),
+    color: isTrue(process.env.LOG_COLOR),
+    prettyPrint: isTrue(process.env.LOG_PRETTY),
     developer_mode: !isProductionEnv(),
     // defaultSender:  undefined,
-    slackHook:      process.env.LOG_SLACK_HOOK || null,
+    slackHook: process.env.LOG_SLACK_HOOK || null
   },
-  graylogger: null,
+  graylogger: null
 }
 
 // order is important! (severe ==> verbose)
 const logLevels = ['CRITICAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE']
 
-
-//to enable logger instances have a default sender - shit's mainly singletonic otherwise
-class Logger { 
-  constructor(defaultSender) {
+// to enable logger instances have a default sender - shit's mainly singletonic otherwise
+class Logger {
+  constructor (defaultSender) {
     this.defaultSender = defaultSender
   }
 
-  critical(msg, extra, sender) { this.loggerPassToConsole('CRITICAL', sender, msg, extra) }
-  error(msg, extra, sender) { this.loggerPassToConsole('ERROR', sender, msg, extra) }
-  warn(msg, extra, sender) { this.loggerPassToConsole('WARN', sender, msg, extra) }
-  info(msg, extra, sender) { this.loggerPassToConsole('INFO', sender, msg, extra) }
-  debug(msg, extra, sender) { this.loggerPassToConsole('DEBUG', sender, msg, extra) }
-  trace(msg, extra, sender) { this.loggerPassToConsole('TRACE', sender, msg, extra) }
+  critical (msg, extra, sender) { this.loggerPassToConsole('CRITICAL', sender, msg, extra) }
+  error (msg, extra, sender) { this.loggerPassToConsole('ERROR', sender, msg, extra) }
+  warn (msg, extra, sender) { this.loggerPassToConsole('WARN', sender, msg, extra) }
+  info (msg, extra, sender) { this.loggerPassToConsole('INFO', sender, msg, extra) }
+  debug (msg, extra, sender) { this.loggerPassToConsole('DEBUG', sender, msg, extra) }
+  trace (msg, extra, sender) { this.loggerPassToConsole('TRACE', sender, msg, extra) }
 
-  loggerPassToConsole(type, sender, msg, extra) {
+  loggerPassToConsole (type, sender, msg, extra) {
     sender = sender || this.defaultSender || logger.settings.defaultSender || 'unknown sender'
     logToConsole(type, sender, msg, extra)
   }
@@ -53,7 +52,6 @@ logger.for = (sender) => {
 logger.get = () => {
   return defaultLogger
 }
-
 
 const colors = {
   Reset: '\x1b[0m',
@@ -81,34 +79,33 @@ const colors = {
   BgBlue: '\x1b[44m',
   BgMagenta: '\x1b[45m',
   BgCyan: '\x1b[46m',
-  BgWhite: '\x1b[47m',
+  BgWhite: '\x1b[47m'
 }
 
 const colorconf = {
-  'timestamp': colors.Dim + colors.FgBlack + colors.BgWhite,
-  'level': {
-    'TRACE': colors.Dim + colors.BgMagenta + colors.FgBlack,
-    'DEBUG': colors.Dim + colors.FgBlack + colors.BgGreen,
-    'INFO': colors.FgBlue + colors.BgCyan,
-    'WARN': colors.Bright + colors.FgYellow + colors.BgBlack +  ' ⚠️ ',
-    'ERROR': colors.Bright + colors.FgRed + colors.BgBlack + ' ❌',
-    'CRITICAL': colors.Bright + colors.BgRed + colors.FgYellow + colors.Blink + ' ☠️ ',
+  timestamp: colors.Dim + colors.FgBlack + colors.BgWhite,
+  level: {
+    TRACE: colors.Dim + colors.BgMagenta + colors.FgBlack,
+    DEBUG: colors.Dim + colors.FgBlack + colors.BgGreen,
+    INFO: colors.FgBlue + colors.BgCyan,
+    WARN: colors.Bright + colors.FgYellow + colors.BgBlack + ' ⚠️ ',
+    ERROR: colors.Bright + colors.FgRed + colors.BgBlack + ' ❌',
+    CRITICAL: colors.Bright + colors.BgRed + colors.FgYellow + colors.Blink + ' ☠️ '
   },
-  'sender': colors.Underscore + colors.FgCyan,
-  'extra': colors.FgWhite + colors.BgBlue,
+  sender: colors.Underscore + colors.FgCyan,
+  extra: colors.FgWhite + colors.BgBlue
 }
-function objToString(obj) {
+function objToString (obj) {
   let str
   try {
-    if (!logger.settings.prettyPrint) { str = JSON.stringify(obj) }
-    else { str = JSON.stringify(obj, null, 4) }
+    if (!logger.settings.prettyPrint) { str = JSON.stringify(obj) } else { str = JSON.stringify(obj, null, 4) }
   } catch (err) {
     logToConsole('WARN', 'logger-module', 'stringification of object failed', err)
     str = '~(Obj)~[un-stringifiable]~~'
   }
   return str
 }
-function colorize(part, str) {
+function colorize (part, str) {
   if (!logger.settings.color) return str
   if (part === 'level') return colorconf.level[str] + ' ' + str + ' ' + colors.Reset
   return colorconf[part] + str + colors.Reset
@@ -116,18 +113,17 @@ function colorize(part, str) {
 
 // initialize the remote logger
 logger.initGraylog = function () {
-  
-  let server1 = {
+  const server1 = {
     host: logger.settings.host,
-    port: logger.settings.port,
+    port: logger.settings.port
   }
-  let options = {
+  const options = {
     servers: [],
-    hostname: os.hostname(),
+    hostname: os.hostname()
   }
   options.servers.push(server1)
 
-  let graylogger = new Graylog(options)
+  const graylogger = new Graylog(options)
 
   /* istanbul ignore next */
   graylogger.on('error', function (error) {
@@ -135,45 +131,45 @@ logger.initGraylog = function () {
   })
   logger.graylogger = graylogger
   logToConsole('INFO', 'logger.initGraylog', 'Connection to Graylog log Server initialized', options)
-  //if (logger.settings.verboseLocal) console.log(logger)
+  // if (logger.settings.verboseLocal) console.log(logger)
 }
 
-function checkType(type) {
+function checkType (type) {
   if (logLevels.indexOf(type) !== -1) return true
   console.log('unknown logging type: "' + type + '"')
   console.log('known logging types are: ' + logLevels.join(','))
   return false
 }
 
-function logThis(type) {
+function logThis (type) {
   return logLevels.indexOf(logger.settings.level.toUpperCase()) >= logLevels.indexOf(type)
 }
 
-function logLocal(type, sender, msgShort, msgLong, extras) {
+function logLocal (type, sender, msgShort, msgLong, extras) {
   type = type.toUpperCase()
   let msg = (logger.settings.color ? colors.Reset : '') +
-            (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') + 
+            (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') +
             colorize('level', type) + '<' + colorize('sender', sender) + '>: '
-  // msg += msgLong ? msgLong : msgShort // nope, msgLong will usually be == extras 
-  msg += msgShort;
-  //if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
-  //else 
+  // msg += msgLong ? msgLong : msgShort // nope, msgLong will usually be == extras
+  msg += msgShort
+  // if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
+  // else
   console.log(msg)
   if (logger.settings.verboseLocal && _.isObject(extras)) {
     console.log(colorize('extra', '↳extras:'), extras)
-  } 
+  }
 }
 
-function slackPost(sender, msgShort) {
+function slackPost (sender, msgShort) {
   if (!logger.settings.slackHook) {
     logToConsole('ERROR', 'slackIntegration', ' 🧨🧨🧨 Cannot post CRITICAL to slack!! No haz webhook!!🧨🧨🧨 ')
     return false
   }
-  let msg = os.hostname() + ': <' + sender + '> ' + msgShort
+  const msg = os.hostname() + ': <' + sender + '> ' + msgShort
   request.post(
     logger.settings.slackHook, {
-      form: `{"text": "${msg}",}`,
-    }, 
+      form: `{"text": "${msg}",}`
+    },
     function (err, response, body) {
       /* istanbul ignore else */ // testing that spams the slack channel..
       if (err) logToConsole('ERROR', 'slackIntegration', ' 🧨🧨🧨 posting to slack failed! 🧨🧨🧨', err)
@@ -188,7 +184,7 @@ function slackPost(sender, msgShort) {
  * @param  {String} msgShort short msg
  * @param  {Object} [extras] some extras e.g. job id
  */
-function logToConsole(type, sender, msgShort, _extras) {
+function logToConsole (type, sender, msgShort, _extras) {
   type = type.toUpperCase()
   if (_.isNull(msgShort)) return
   if (!checkType(type)) return
@@ -209,16 +205,16 @@ function logToConsole(type, sender, msgShort, _extras) {
     if (logger.graylogger === null) logger.initGraylog()
 
     // smallExtras added because just sending the extras json can lead to trouble with indexing on the graylog server if it's not consistent
-    let smallExtras = {
+    const smallExtras = {
       sender: sender,
-      type: type,
+      type: type
     }
     if (extras.user_id) smallExtras.user_id = extras.user_id
     if (extras.filename) smallExtras.filename = extras.filename
 
     // limit size of msgLong to avoid excessive storage consumtion and failures
     // (up to 32766 byte strings should be possible, but 10k characters is already plenty for reasonable logging output)
-    const msgLongGray = (typeof msgLong === 'string' ? msgLong.substring(0,10000) : null)
+    const msgLongGray = (typeof msgLong === 'string' ? msgLong.substring(0, 10000) : null)
 
     try {
       logger.graylogger.log(msgShort, msgLongGray, smallExtras)
@@ -235,8 +231,7 @@ function logToConsole(type, sender, msgShort, _extras) {
   }
 }
 
-
-export { 
+export {
   logToConsole,
-  logger as Logger,
+  logger as Logger
 }
