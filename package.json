@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/parcelLab/parcellab-utilities#readme",
   "dependencies": {
-    "countryjs": "^1.8.0",
+    "countryjs": "github:parcellab/countryjs",
     "graylog2": "^0.2.1",
     "request": "^2.88.0",
     "underscore": "^1.9.1"
