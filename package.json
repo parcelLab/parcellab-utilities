@@ -4,7 +4,7 @@
   "description": "parcellab DRY code",
   "main": "index.js",
   "scripts": {
-    "test": "unset LOG_LEVEL; nyc mocha --require babel-core/register --exit",
+    "test": "unset LOG_LEVEL; nyc mocha --exit",
     "build": "babel ./src -d ./lib",
     "publish": "npm run build && git commit -a -m 'buit release....' && npm version patch && git push --follow-tags"
   },
@@ -20,17 +20,21 @@
   },
   "homepage": "https://github.com/parcelLab/parcellab-utilities#readme",
   "dependencies": {
+    "@sentry/node": "^8.7.0",
     "countryjs": "github:parcellab/countryjs",
     "graylog2": "^0.2.1",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
+    "@babel/cli": "^7.24.7",
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
+    "babel-plugin-istanbul": "^6.1.1",
     "eslint": "^5.12.0",
     "eslint-config-parcellab": "0.0.1",
     "mocha": "^5.2.0",
-    "nyc": "^14.1.1"
+    "nyc": "^15.1.0"
   },
   "nyc": {
     "reporter": [
