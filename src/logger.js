@@ -18,7 +18,6 @@ const logger = {
     prettyPrint:    isTrue(process.env.LOG_PRETTY),
     developer_mode: !isProductionEnv(),
     // defaultSender:  undefined,
-    slackHook:      process.env.LOG_SLACK_HOOK || null,
   },
   graylogger: null,
 }

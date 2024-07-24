@@ -20,9 +20,25 @@ declare class LoggerClass {
     trace(msg: string, extra?: Extra, sender?: string): void
 }
 
+declare const logger: {
+    for(sender: string): LoggerClass;
+    settings: {
+        level: string;
+        host: string;
+        port: string|number;
+        saveLocal: boolean;
+        timestampLocal: boolean;
+        verboseLocal: boolean;
+        color: boolean;
+        prettyPrint: boolean;
+        developer_mode: boolean;
+        slackHook: any;
+    };
+}
+
 declare const _exports: {
     logToConsole: typeof logToConsole;
-    Logger: { for(sender: string): LoggerClass };
+    Logger: typeof logger;
     resolveCountryToISO2: (countryInfo: string) => string | null;
     resolveCountryToISO3: (countryInfo: string) => string | null;
 };

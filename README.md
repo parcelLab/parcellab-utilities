@@ -26,7 +26,6 @@ LOG_LOCAL=1                   ||    Logger.settings.saveLocal = true
 LOG_EXTRA=1                   ||    Logger.settings.verboseLocal = true
 LOG_PRETTY=1                  ||    Logger.settings.prettyPrint = true
 LOG_TIMESTAMP=1               ||    Logger.settings.timestampLocal = true
-LOG_SLACK_HOOK=httbla         ||    Logger.settings.slackHook = 'httbla'
 PRODUCTION=0                  ||    Logger.settings.developer_mode = true
 
 ```
