@@ -1,7 +1,7 @@
-import { logger } from './logger'
 import * as Country from 'countryjs'
-const _ = require('underscore')
+import { isString } from 'lodash'
 
+import { logger } from './logger'
 
 /**
  * takes unidentified country info and tries to get the ISO2/ISO3 Code
@@ -17,15 +17,15 @@ function resolveCountryToISO(countryInfo, digits) {
 
   try {
     if (ci.length === 3) {
-      c = Country.ISOcodes(_.isString(ci) ? ci.toUpperCase() : ci, 'ISO3')
+      c = Country.ISOcodes(isString(ci) ? ci.toUpperCase() : ci, 'ISO3')
     } else if (ci.length === 2) {
-      c = Country.ISOcodes(_.isString(ci) ? ci.toUpperCase() : ci)
+      c = Country.ISOcodes(isString(ci) ? ci.toUpperCase() : ci)
     } else {
       c = Country.ISOcodes(ci, 'name')
     } 
 
     // check for special cases
-    if (!c && _.isString(ci)) { 
+    if (!c && isString(ci)) { 
 
       // make it great again
       if ((ci.toUpperCase() === 'THE UNITED STATES OF AMERICA')

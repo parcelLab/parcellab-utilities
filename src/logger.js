@@ -1,7 +1,7 @@
 const os = require('os')
-const _ = require('underscore')
-const request = require('request')
+const { isNull, isObject } = require('lodash')
 const graylog2 = require('graylog2')
+
 const Graylog = graylog2.graylog
 
 import { isTrue, isProductionEnv } from './util'
@@ -175,26 +175,9 @@ function logLocal(type, sender, msgShort, msgLong, extras) {
   //if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
   //else 
   console.log(msg)
-  if (logger.settings.verboseLocal && _.isObject(extras)) {
+  if (logger.settings.verboseLocal && isObject(extras)) {
     console.log(colorize('extra', '↳extras:'), extras)
   } 
-}
-
-function slackPost(sender, msgShort) {
-  if (!logger.settings.slackHook) {
-    logToConsole(logLevel.ERROR, 'slackIntegration', ' 🧨🧨🧨 Cannot post CRITICAL to slack!! No haz webhook!!🧨🧨🧨 ')
-    return false
-  }
-  let msg = os.hostname() + ': <' + sender + '> ' + msgShort
-  request.post(
-    logger.settings.slackHook, {
-      form: `{"text": "${msg}",}`,
-    }, 
-    function (err, response, body) {
-      /* istanbul ignore else */ // testing that spams the slack channel..
-      if (err) logToConsole(logLevel.ERROR, 'slackIntegration', ' 🧨🧨🧨 posting to slack failed! 🧨🧨🧨', err)
-      else if (!err) { logToConsole(logLevel.INFO, 'slackIntegration', 'response from webhook: ', { response: response, body: body }) }
-    })
 }
 
 /**
@@ -206,19 +189,19 @@ function slackPost(sender, msgShort) {
  */
 function logToConsole(type, sender, msgShort, _extras) {
   type = type.toUpperCase()
-  if (_.isNull(msgShort)) return
+  if (isNull(msgShort)) return
   if (!checkType(type)) return
   if (!logThis(type)) return
 
   let extras = {}
   if (_extras) extras = Object.assign({}, _extras)
 
-  if (_.isObject(msgShort)) msgShort = objToString(msgShort)
+  if (isObject(msgShort)) msgShort = objToString(msgShort)
 
   // sender = sender.toUpperCase()
 
   let msgLong = extras.msgLong || _extras
-  if (_.isObject(msgLong)) msgLong = objToString(msgLong)
+  if (isObject(msgLong)) msgLong = objToString(msgLong)
 
   // in production mode send the message to graylog as well.
   if (!logger.settings.developer_mode) {
@@ -240,9 +223,6 @@ function logToConsole(type, sender, msgShort, _extras) {
       logger.graylogger.log(msgShort, msgLongGray, smallExtras)
     } catch (e) {
       logLocal('error', 'logger', 'trying to log something illegal? msgShort: ' + msgShort + ' msgLong: ' + msgLong + ' extras: ' + extras + ' orig msg: ' + e, false, { extras: extras, error: e })
-    }
-    if (type === logLevel.CRITICAL) {
-      slackPost(sender, msgShort)
     }
   }
 

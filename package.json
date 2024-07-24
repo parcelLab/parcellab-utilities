@@ -1,6 +1,6 @@
 {
   "name": "parcellab-utilities",
-  "version": "1.5.9",
+  "version": "1.6.1",
   "description": "parcellab DRY code",
   "main": "index.js",
   "scripts": {
@@ -22,8 +22,7 @@
   "dependencies": {
     "countryjs": "github:parcellab/countryjs",
     "graylog2": "^0.2.1",
-    "request": "^2.88.2",
-    "underscore": "^1.13.6"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
