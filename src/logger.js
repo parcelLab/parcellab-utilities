@@ -196,6 +196,7 @@ function logToConsole(type, sender, msgShort, _extras) {
       type: type,
     }
     if (extras.user_id) smallExtras.user_id = Number(extras.user_id) || 0
+    if (extras.userId && !smallExtras.user_id) smallExtras.user_id = Number(extras.userId) || 0
     if (extras.filename) smallExtras.filename = extras.filename
 
     // limit size of msgLong to avoid excessive storage consumtion and failures
