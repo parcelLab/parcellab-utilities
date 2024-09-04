@@ -1,5 +1,6 @@
 type Extra = {
     user_id?: number,
+    userId?: number,
     filename?: string,
 } & Record<string, unknown>
 
