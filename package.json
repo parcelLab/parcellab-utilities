@@ -29,6 +29,7 @@
     "@babel/core": "^7.24.9",
     "@babel/preset-env": "^7.24.8",
     "@babel/register": "^7.24.6",
+    "@semantic-release/git": "^10.0.1",
     "eslint": "^8.57.0",
     "eslint-config-parcellab": "0.0.1",
     "mocha": "^10.7.0",
@@ -38,6 +39,27 @@
     "reporter": [
       "lcov",
       "text"
+    ]
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json",
+            "package-lock.json",
+            "lib/"
+          ]
+        }
+      ]
     ]
   }
 }
