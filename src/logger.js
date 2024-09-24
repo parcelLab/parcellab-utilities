@@ -152,7 +152,7 @@ function logThis(type) {
 function logLocal(type, sender, msgShort, msgLong, extras) {
   type = type.toUpperCase()
   const msg = (logger.settings.color ? colors.Reset : '') +
-    (logger.settings.timestampLocal ? colorize('timestamp', String(new Date()).toJSON()) : '') +
+    (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) : '') +
     colorize('level', type) + '<' + colorize('sender', sender) + '>: '
 
   console.log(msg + msgShort)
