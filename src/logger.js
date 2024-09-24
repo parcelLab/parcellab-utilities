@@ -19,6 +19,7 @@ const logger = {
     developer_mode: !isProductionEnv(),
     // defaultSender:  undefined,
   },
+  /** @type {import('graylog2').graylog}*/
   graylogger: null,
 }
 
@@ -27,7 +28,7 @@ const logLevels = ['CRITICAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE']
 
 
 //to enable logger instances have a default sender - shit's mainly singletonic otherwise
-class Logger { 
+class Logger {
   constructor(defaultSender) {
     this.defaultSender = defaultSender
   }
@@ -89,7 +90,7 @@ const colorconf = {
     'TRACE': colors.Dim + colors.BgMagenta + colors.FgBlack,
     'DEBUG': colors.Dim + colors.FgBlack + colors.BgGreen,
     'INFO': colors.FgBlue + colors.BgCyan,
-    'WARN': colors.Bright + colors.FgYellow + colors.BgBlack +  ' ⚠️ ',
+    'WARN': colors.Bright + colors.FgYellow + colors.BgBlack + ' ⚠️ ',
     'ERROR': colors.Bright + colors.FgRed + colors.BgBlack + ' ❌',
     'CRITICAL': colors.Bright + colors.BgRed + colors.FgYellow + colors.Blink + ' ☠️ ',
   },
@@ -115,18 +116,18 @@ function colorize(part, str) {
 
 // initialize the remote logger
 logger.initGraylog = function () {
-  
-  let server1 = {
+
+  const server1 = {
     host: logger.settings.host,
     port: logger.settings.port,
   }
-  let options = {
+  const options = {
     servers: [],
     hostname: os.hostname(),
   }
   options.servers.push(server1)
 
-  let graylogger = new Graylog(options)
+  const graylogger = new Graylog(options)
 
   /* istanbul ignore next */
   graylogger.on('error', function (error) {
@@ -139,8 +140,8 @@ logger.initGraylog = function () {
 
 function checkType(type) {
   if (logLevels.indexOf(type) !== -1) return true
-  console.log('unknown logging type: "' + type + '"')
-  console.log('known logging types are: ' + logLevels.join(','))
+  console.log(`unknown logging type: "${type}"`)
+  console.log(`known logging types are: ${logLevels.join(', ')}`)
   return false
 }
 
@@ -150,17 +151,15 @@ function logThis(type) {
 
 function logLocal(type, sender, msgShort, msgLong, extras) {
   type = type.toUpperCase()
-  let msg = (logger.settings.color ? colors.Reset : '') +
-            (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') + 
-            colorize('level', type) + '<' + colorize('sender', sender) + '>: '
-  // msg += msgLong ? msgLong : msgShort // nope, msgLong will usually be == extras 
-  msg += msgShort
-  //if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
-  //else 
-  console.log(msg)
+  const msg = (logger.settings.color ? colors.Reset : '') +
+    (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) : '') +
+    colorize('level', type) + '<' + colorize('sender', sender) + '>: '
+
+  console.log(msg + msgShort)
+
   if (logger.settings.verboseLocal && isObject(extras)) {
     console.log(colorize('extra', '↳extras:'), extras)
-  } 
+  }
 }
 
 /**
@@ -191,22 +190,26 @@ function logToConsole(type, sender, msgShort, _extras) {
     if (logger.graylogger === null) logger.initGraylog()
 
     // smallExtras added because just sending the extras json can lead to trouble with indexing on the graylog server if it's not consistent
-    let smallExtras = {
-      sender: sender,
-      type: type,
-    }
+    const smallExtras = { sender, type }
     if (extras.user_id) smallExtras.user_id = Number(extras.user_id) || 0
     if (extras.userId && !smallExtras.user_id) smallExtras.user_id = Number(extras.userId) || 0
     if (extras.filename) smallExtras.filename = extras.filename
 
     // limit size of msgLong to avoid excessive storage consumtion and failures
     // (up to 32766 byte strings should be possible, but 10k characters is already plenty for reasonable logging output)
-    const msgLongGray = (typeof msgLong === 'string' ? msgLong.substring(0,10000) : null)
+    const msgLongGray = (typeof msgLong === 'string' ? msgLong.substring(0, 10000) : null)
 
     try {
-      logger.graylogger.log(msgShort, msgLongGray, smallExtras)
+      const leveledLogFunction = logger.graylogger[type.toLowerCase()] || logger.graylogger.info
+      leveledLogFunction(msgShort, msgLongGray, smallExtras)
     } catch (e) {
-      logLocal('error', 'logger', 'trying to log something illegal? msgShort: ' + msgShort + ' msgLong: ' + msgLong + ' extras: ' + extras + ' orig msg: ' + e, false, { extras: extras, error: e })
+      logLocal(
+        'error',
+        'logger',
+        `trying to log something illegal? msgShort: ${msgShort} msgLong: ${msgLong} extras: ${extras} orig msg: ${e}`,
+        false,
+        { extras, error: e },
+      )
     }
   }
 
@@ -216,7 +219,7 @@ function logToConsole(type, sender, msgShort, _extras) {
 }
 
 
-export { 
+export {
   logToConsole,
   logger as Logger,
 }
