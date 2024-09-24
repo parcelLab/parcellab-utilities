@@ -1,5 +1,5 @@
 {
-  "name": "parcellab-utilities",
+  "name": "@parcellab/utilities",
   "version": "1.6.2",
   "description": "parcellab DRY code",
   "main": "index.js",
