@@ -31,6 +31,11 @@ jobs:
           app-id: ${{ secrets.PARCELLAB_BOT_APPID }}
           private-key: ${{ secrets.PARCELLAB_BOT_KEY }}
 
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
