@@ -35,8 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GIT_AUTHOR_NAME: DEVan BOTomly
-          GIT_AUTHOR_EMAIL: dev.bot@parcellab.com
-          GIT_COMMITTER_NAME: DEVan BOTomly
-          GIT_COMMITTER_EMAIL: dev.bot@parcellab.com
-        run: npx semantic-release
+        run: |
+          git config user.name "parcellab-dev-bot"
+          git config user.email "dev.bot@parcellab.com"          
+          npx semantic-release
