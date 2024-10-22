@@ -43,7 +43,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
-          NPM_GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
+          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
 #          GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
 #          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
 #          NODE_AUTH_TOKEN: ${{ secrets.githubAuthToken }}
