@@ -34,11 +34,11 @@ jobs:
       - run: git config user.email "dev.bot@parcellab.com"
       - run: git config user.name "parcellab-dev-bot"
 
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
-          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
-        run: |
-          git config user.name "parcellab-dev-bot"
-          git config user.email "dev.bot@parcellab.com"          
-          npx semantic-release
+#      - name: Release
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
+#          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
+#        run: |
+#          git config user.name "parcellab-dev-bot"
+#          git config user.email "dev.bot@parcellab.com"
+#          npx semantic-release
