@@ -1,0 +1,28 @@
+name: Test and draft release
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**.js"
+      - "**.ts"
+      - Containerfile
+      - package.json
+  pull_request:
+    paths:
+      - "**.js"
+      - "**.ts"
+      - package.json
+  workflow_dispatch:
+jobs:
+  verify:
+    uses: parcelLab/ci/.github/workflows/js.yaml@v1
+    secrets:
+      npmGithubReadToken: ${{ secrets.PACKAGES_READ_TOKEN }}
+  draft:
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - verify
+    uses: parcelLab/ci/.github/workflows/release.yaml@v1
+    secrets:
+      repoAccessToken: ${{ secrets.REPO_ACCESS_TOKEN }}

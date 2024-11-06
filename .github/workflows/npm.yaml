@@ -1,0 +1,40 @@
+name: NPM
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The version to publish (without 'v', e.g. 1.0.0)
+        required: true
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.load_version.outputs.version }}
+    steps:
+      - name: Load version
+        id: load_version
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = 'workflow_dispatch' ]
+          then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            if [ "$GITHUB_EVENT_NAME" = 'release' ]
+            then
+              TAG_NAME="${{ github.event.release.tag_name }}"
+            else
+              TAG_NAME="${{ github.ref }}"
+            fi
+            CLEAN_TAG=${TAG_NAME##*/}
+            VERSION=${CLEAN_TAG//v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+  publish:
+    needs: version
+    uses: parcelLab/ci/.github/workflows/npm.yaml@013318828277a8080a797dbc6bc2a095c6de3692
+    with:
+      version: ${{ needs.version.outputs.version }}
+    secrets:
+      githubAuthToken: ${{ secrets.REPO_ACCESS_TOKEN }} # For private packages
