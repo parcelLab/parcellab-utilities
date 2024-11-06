@@ -4,6 +4,7 @@
   "description": "parcellab DRY code",
   "main": "index.js",
   "scripts": {
+    "lint": "echo 'Linting missing in this project'",
     "test": "unset LOG_LEVEL; nyc mocha --require @babel/register --exit",
     "build": "babel ./src -d ./lib",
     "publish": "npm run build && git commit -a -m 'buit release....' && npm version patch && git push --follow-tags"
