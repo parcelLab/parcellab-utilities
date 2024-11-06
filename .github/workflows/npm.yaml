@@ -38,3 +38,4 @@ jobs:
       version: ${{ needs.version.outputs.version }}
     secrets:
       githubAuthToken: ${{ secrets.REPO_ACCESS_TOKEN }} # For private packages
+      npmjsAuthToken: ${{ secrets.NPM_TOKEN }} # For public packages
