@@ -26,3 +26,4 @@ jobs:
     uses: parcelLab/ci/.github/workflows/release.yaml@v1
     secrets:
       repoAccessToken: ${{ secrets.REPO_ACCESS_TOKEN }}
+      npmjsAuthToken: ${{ secrets.NPM_TOKEN }}
