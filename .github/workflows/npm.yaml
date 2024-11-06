@@ -36,6 +36,7 @@ jobs:
     uses: parcelLab/ci/.github/workflows/npm.yaml@013318828277a8080a797dbc6bc2a095c6de3692
     with:
       version: ${{ needs.version.outputs.version }}
+      defaultBranch: master
     secrets:
       githubAuthToken: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }} # For private packages
       npmjsAuthToken: ${{ secrets.NPM_TOKEN }} # For public packages
