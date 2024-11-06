@@ -1,4 +1,4 @@
-name: Test and draft release
+name: Test, Build & Release
 on:
   push:
     branches:
@@ -24,5 +24,7 @@ jobs:
     needs:
       - verify
     uses: parcelLab/ci/.github/workflows/release.yaml@v1
+    with:
+      targetBranch: master
     secrets:
       repoAccessToken: ${{ secrets.REPO_ACCESS_TOKEN_OPEN_SOURCE }}
