@@ -84,7 +84,7 @@ const colors = {
   BgWhite: '\x1b[47m',
 }
 
-const colorconf = {
+const colorConf = {
   'timestamp': colors.Dim + colors.FgBlack + colors.BgWhite,
   'level': {
     'TRACE': colors.Dim + colors.BgMagenta + colors.FgBlack,
@@ -110,8 +110,8 @@ function objToString(obj) {
 }
 function colorize(part, str) {
   if (!logger.settings.color) return str
-  if (part === 'level') return colorconf.level[str] + ' ' + str + ' ' + colors.Reset
-  return colorconf[part] + str + colors.Reset
+  if (part === 'level') return `${colorConf.level[str]} ${str} ${colors.Reset}`
+  return colorConf[part] + str + colors.Reset
 }
 
 // initialize the remote logger
@@ -131,7 +131,7 @@ logger.initGraylog = function () {
 
   /* istanbul ignore next */
   graylogger.on('error', function (error) {
-    console.log(' 👾 !ERROR! while trying to write to graylog2:', error)
+    console.error(' 👾 !ERROR! while trying to write to graylog2:', error)
   })
   logger.graylogger = graylogger
   logToConsole('INFO', 'logger.initGraylog', 'Connection to Graylog log Server initialized', options)
@@ -140,8 +140,8 @@ logger.initGraylog = function () {
 
 function checkType(type) {
   if (logLevels.indexOf(type) !== -1) return true
-  console.log(`unknown logging type: "${type}"`)
-  console.log(`known logging types are: ${logLevels.join(', ')}`)
+  console.error(`unknown logging type: "${type}"`)
+  console.info(`known logging types are: ${logLevels.join(', ')}`)
   return false
 }
 
@@ -175,8 +175,7 @@ function logToConsole(type, sender, msgShort, _extras) {
   if (!checkType(type)) return
   if (!logThis(type)) return
 
-  let extras = {}
-  if (_extras) extras = Object.assign({}, _extras)
+  const extras = _extras ? Object.assign({}, _extras) : {}
 
   if (isObject(msgShort)) msgShort = objToString(msgShort)
 
@@ -194,6 +193,8 @@ function logToConsole(type, sender, msgShort, _extras) {
     if (extras.user_id) smallExtras.user_id = Number(extras.user_id) || 0
     if (extras.userId && !smallExtras.user_id) smallExtras.user_id = Number(extras.userId) || 0
     if (extras.filename) smallExtras.filename = extras.filename
+    if (extras.trace_id) smallExtras.trace_id = String(extras.trace_id)
+    if (extras.database_id) smallExtras.database_id = String(extras.database_id)
 
     // limit size of msgLong to avoid excessive storage consumtion and failures
     // (up to 32766 byte strings should be possible, but 10k characters is already plenty for reasonable logging output)
