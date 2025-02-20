@@ -1,6 +1,8 @@
 type Extra = {
     user_id?: number,
     filename?: string,
+    trace_id?: string,
+    database_id?: string | number,
 } & Record<string, unknown>
 
 declare function logToConsole(
@@ -25,7 +27,7 @@ declare const logger: {
     settings: {
         level: string;
         host: string;
-        port: string|number;
+        port: string | number;
         saveLocal: boolean;
         timestampLocal: boolean;
         verboseLocal: boolean;
