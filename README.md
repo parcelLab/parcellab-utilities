@@ -1,7 +1,7 @@
-# parcellab-utilities 
+# parcelLab Utilities 
 npm package for shared functionality
 
-**install:** `npm i --save parcellab/parcellab-utilities`
+**install:** `npm install @parcellab/utilities`
 
 ## logger
 
