@@ -2,9 +2,9 @@ const os = require('os')
 const { isNull, isObject } = require('lodash')
 const graylog2 = require('graylog2')
 
-const Graylog = graylog2.graylog
-
 import { isTrue, isProductionEnv } from './util'
+
+const Graylog2 = graylog2.graylog
 
 const logger = {
   settings: {
@@ -25,7 +25,6 @@ const logger = {
 
 // order is important! (severe ==> verbose)
 const logLevels = ['CRITICAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE']
-
 
 //to enable logger instances have a default sender - shit's mainly singletonic otherwise
 class Logger {
@@ -97,6 +96,7 @@ const colorConf = {
   'sender': colors.Underscore + colors.FgCyan,
   'extra': colors.FgWhite + colors.BgBlue,
 }
+
 function objToString(obj) {
   let str
   try {
@@ -108,10 +108,19 @@ function objToString(obj) {
   }
   return str
 }
+
 function colorize(part, str) {
   if (!logger.settings.color) return str
   if (part === 'level') return `${colorConf.level[str]} ${str} ${colors.Reset}`
   return colorConf[part] + str + colors.Reset
+}
+
+function stringify(value) {
+  try {
+    return JSON.stringify(value)
+  } catch (e) {
+    return String(value)
+  }
 }
 
 // initialize the remote logger
@@ -127,7 +136,7 @@ logger.initGraylog = function () {
   }
   options.servers.push(server1)
 
-  const graylogger = new Graylog(options)
+  const graylogger = new Graylog2(options)
 
   /* istanbul ignore next */
   graylogger.on('error', function (error) {
@@ -149,7 +158,7 @@ function logThis(type) {
   return logLevels.indexOf(logger.settings.level.toUpperCase()) >= logLevels.indexOf(type)
 }
 
-function logLocal(type, sender, msgShort, msgLong, extras) {
+function logLocal(type, sender, msgShort, extras) {
   type = type.toUpperCase()
   const msg = (logger.settings.color ? colors.Reset : '') +
     (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) : '') +
@@ -202,20 +211,20 @@ function logToConsole(type, sender, msgShort, _extras) {
 
     try {
       const leveledLogFunction = logger.graylogger[type.toLowerCase()] || logger.graylogger.info
-      leveledLogFunction(msgShort, msgLongGray, smallExtras)
+      const bindedLogFunction = leveledLogFunction.bind(logger.graylogger)
+      bindedLogFunction(msgShort, msgLongGray, smallExtras)
     } catch (e) {
       logLocal(
         'error',
         'logger',
-        `trying to log something illegal? msgShort: ${msgShort} msgLong: ${msgLong} extras: ${extras} orig msg: ${e}`,
-        false,
+        `Failed to log to Graylog, falling back to local.\nmsgShort: ${msgShort} | msgLong: ${msgLong} | extras: ${stringify(extras)} | orig msg: ${e}`,
         { extras, error: e },
       )
     }
   }
 
   if (logger.settings.developer_mode || logger.settings.saveLocal) {
-    logLocal(type, sender, msgShort, msgLong, _extras)
+    logLocal(type, sender, msgShort, _extras)
   }
 }
 
