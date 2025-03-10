@@ -1,6 +1,11 @@
+.nyc_output/
+.vscode/
+coverage/
+lib-cov/
+logs/
+node_modules/
+tmp/
 
 .DS_Store
-.nyc_output
-coverage
-lib-cov
-node_modules
+.env
+*.log

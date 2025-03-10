@@ -2,9 +2,9 @@ const os = require('os')
 const { isNull, isObject } = require('lodash')
 const graylog2 = require('graylog2')
 
-const Graylog = graylog2.graylog
-
 import { isTrue, isProductionEnv } from './util'
+
+const Graylog2 = graylog2.graylog
 
 const logger = {
   settings: {
@@ -18,8 +18,8 @@ const logger = {
     prettyPrint:    isTrue(process.env.LOG_PRETTY),
     developer_mode: !isProductionEnv(),
     // defaultSender:  undefined,
-    slackHook:      process.env.LOG_SLACK_HOOK || null,
   },
+  /** @type {import('graylog2').graylog}*/
   graylogger: null,
 }
 
@@ -42,9 +42,8 @@ const logLevelsSorted = [
   logLevel.TRACE,
 ]
 
-
 //to enable logger instances have a default sender - shit's mainly singletonic otherwise
-class Logger { 
+class Logger {
   constructor(defaultSender) {
     this.defaultSender = defaultSender
   }
@@ -100,7 +99,7 @@ const colors = {
   BgWhite: '\x1b[47m',
 }
 
-const colorconf = {
+const colorConf = {
   'timestamp': colors.Dim + colors.FgBlack + colors.BgWhite,
   'level': {
     [logLevel.TRACE]: colors.Dim + colors.BgMagenta + colors.FgBlack,
@@ -113,6 +112,7 @@ const colorconf = {
   'sender': colors.Underscore + colors.FgCyan,
   'extra': colors.FgWhite + colors.BgBlue,
 }
+
 function objToString(obj) {
   let str
   try {
@@ -124,30 +124,39 @@ function objToString(obj) {
   }
   return str
 }
+
 function colorize(part, str) {
   if (!logger.settings.color) return str
-  if (part === 'level') return colorconf.level[str] + ' ' + str + ' ' + colors.Reset
-  return colorconf[part] + str + colors.Reset
+  if (part === 'level') return `${colorConf.level[str]} ${str} ${colors.Reset}`
+  return colorConf[part] + str + colors.Reset
+}
+
+function stringify(value) {
+  try {
+    return JSON.stringify(value)
+  } catch (e) {
+    return String(value)
+  }
 }
 
 // initialize the remote logger
 logger.initGraylog = function () {
-  
-  let server1 = {
+
+  const server1 = {
     host: logger.settings.host,
     port: logger.settings.port,
   }
-  let options = {
+  const options = {
     servers: [],
     hostname: os.hostname(),
   }
   options.servers.push(server1)
 
-  let graylogger = new Graylog(options)
+  const graylogger = new Graylog2(options)
 
   /* istanbul ignore next */
   graylogger.on('error', function (error) {
-    console.log(' 👾 !ERROR! while trying to write to graylog2:', error)
+    console.error(' 👾 !ERROR! while trying to write to graylog2:', error)
   })
   logger.graylogger = graylogger
   logToConsole(logLevel.INFO, 'logger.initGraylog', 'Connection to Graylog log Server initialized', options)
@@ -156,8 +165,8 @@ logger.initGraylog = function () {
 
 function checkType(type) {
   if (logLevelsSorted.indexOf(type) !== -1) return true
-  console.log('unknown logging type: "' + type + '"')
-  console.log('known logging types are: ' + logLevelsSorted.join(','))
+  console.error(`unknown logging type: "${type}"`)
+  console.info(`known logging types are: ${logLevelsSorted.join(', ')}`)
   return false
 }
 
@@ -165,19 +174,17 @@ function logThis(type) {
   return logLevelsSorted.indexOf(logger.settings.level.toUpperCase()) >= logLevelsSorted.indexOf(type)
 }
 
-function logLocal(type, sender, msgShort, msgLong, extras) {
+function logLocal(type, sender, msgShort, extras) {
   type = type.toUpperCase()
-  let msg = (logger.settings.color ? colors.Reset : '') +
-            (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) + ' ' : '') + 
-            colorize('level', type) + '<' + colorize('sender', sender) + '>: '
-  // msg += msgLong ? msgLong : msgShort // nope, msgLong will usually be == extras 
-  msg += msgShort
-  //if (['ERROR', 'WARN'].indexOf(type) !== -1) console.error(msg)
-  //else 
-  console.log(msg)
+  const msg = (logger.settings.color ? colors.Reset : '') +
+    (logger.settings.timestampLocal ? colorize('timestamp', (new Date()).toJSON()) : '') +
+    colorize('level', type) + '<' + colorize('sender', sender) + '>: '
+
+  console.log(msg + msgShort)
+
   if (logger.settings.verboseLocal && isObject(extras)) {
     console.log(colorize('extra', '↳extras:'), extras)
-  } 
+  }
 }
 
 /**
@@ -193,8 +200,7 @@ function logToConsole(type, sender, msgShort, _extras) {
   if (!checkType(type)) return
   if (!logThis(type)) return
 
-  let extras = {}
-  if (_extras) extras = Object.assign({}, _extras)
+  const extras = _extras ? Object.assign({}, _extras) : {}
 
   if (isObject(msgShort)) msgShort = objToString(msgShort)
 
@@ -208,26 +214,33 @@ function logToConsole(type, sender, msgShort, _extras) {
     if (logger.graylogger === null) logger.initGraylog()
 
     // smallExtras added because just sending the extras json can lead to trouble with indexing on the graylog server if it's not consistent
-    let smallExtras = {
-      sender: sender,
-      type: type,
-    }
-    if (extras.user_id) smallExtras.user_id = extras.user_id
+    const smallExtras = { sender, type }
+    if (extras.user_id) smallExtras.user_id = Number(extras.user_id) || 0
+    if (extras.userId && !smallExtras.user_id) smallExtras.user_id = Number(extras.userId) || 0
     if (extras.filename) smallExtras.filename = extras.filename
+    if (extras.trace_id) smallExtras.trace_id = String(extras.trace_id)
+    if (extras.database_id) smallExtras.database_id = String(extras.database_id)
 
     // limit size of msgLong to avoid excessive storage consumtion and failures
     // (up to 32766 byte strings should be possible, but 10k characters is already plenty for reasonable logging output)
-    const msgLongGray = (typeof msgLong === 'string' ? msgLong.substring(0,10000) : null)
+    const msgLongGray = (typeof msgLong === 'string' ? msgLong.substring(0, 10000) : null)
 
     try {
-      logger.graylogger.log(msgShort, msgLongGray, smallExtras)
+      const leveledLogFunction = logger.graylogger[type.toLowerCase()] || logger.graylogger.info
+      const bindedLogFunction = leveledLogFunction.bind(logger.graylogger)
+      bindedLogFunction(msgShort, msgLongGray, smallExtras)
     } catch (e) {
-      logLocal('error', 'logger', 'trying to log something illegal? msgShort: ' + msgShort + ' msgLong: ' + msgLong + ' extras: ' + extras + ' orig msg: ' + e, false, { extras: extras, error: e })
+      logLocal(
+        'error',
+        'logger',
+        `Failed to log to Graylog, falling back to local.\nmsgShort: ${msgShort} | msgLong: ${msgLong} | extras: ${stringify(extras)} | orig msg: ${e}`,
+        { extras, error: e },
+      )
     }
   }
 
   if (logger.settings.developer_mode || logger.settings.saveLocal) {
-    logLocal(type, sender, msgShort, msgLong, _extras)
+    logLocal(type, sender, msgShort, _extras)
   }
 }
 
@@ -238,7 +251,7 @@ logToConsole.WARN = logLevel.WARN
 logToConsole.ERROR = logLevel.ERROR
 logToConsole.CRITICAL = logLevel.CRITICAL
 
-export { 
+export {
   logToConsole,
   logger as Logger,
   logLevel,

@@ -64,16 +64,6 @@ export default function () {
         assert.strictEqual(logger.info('bla'), undefined)
         assert.strictEqual(logger.warn('bla'), undefined)
       })
-      it('should post on slack  when the level is critical (in production mode)', function () {
-        Logger.settings.developer_mode = false
-        Logger.settings.prettyPrint = true
-        Logger.settings.slackHook = 'https://phone'
-        assert.strictEqual(logger.critical('//phone is actially not a slack hook ', null, 'fakeNews'), undefined)
-      })
-      it('but loudly complain when the slack hook is not provided by the env', function () {
-        Logger.settings.slackHook = null
-        assert.strictEqual(logger.critical('give me some slack please!', { user_id: 12, filename: 'test' }), undefined)
-      })
       it('and thats what a cricital should look like on the console in dev mode', function () {
         Logger.settings.developer_mode = true
         assert.strictEqual(logger.critical(' SYSTEM LOAD OVER 90000! ', { load: 90001 }, 'vegetad'), undefined)
@@ -103,7 +93,6 @@ export default function () {
       it('it should puke up on you', function () {
         Logger.settings.verboseLocal = true
         Logger.settings.developer_mode = false
-        let port = Logger.settings.port
         Logger.settings.port = null
         assert.strictEqual((() => {
           Logger.initGraylog()

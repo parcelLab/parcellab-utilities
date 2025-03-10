@@ -1,12 +1,12 @@
 {
-  "name": "parcellab-utilities",
-  "version": "1.6.1",
+  "name": "@parcellab/utilities",
+  "version": "1.11.1",
   "description": "parcellab DRY code",
   "main": "index.js",
   "scripts": {
-    "test": "unset LOG_LEVEL; nyc mocha --require babel-core/register --exit",
-    "build": "babel ./src -d ./lib",
-    "publish": "npm run build && git commit -a -m 'buit release....' && npm version patch && git push --follow-tags"
+    "lint": "echo 'Linting missing in this project'",
+    "test": "unset LOG_LEVEL; nyc mocha --require @babel/register --exit",
+    "build": "babel ./src -d ./lib"
   },
   "repository": {
     "type": "git",
@@ -25,17 +25,41 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^7.32.0",
+    "@babel/cli": "^7.24.8",
+    "@babel/core": "^7.24.9",
+    "@babel/preset-env": "^7.24.8",
+    "@babel/register": "^7.24.6",
+    "@semantic-release/git": "^9.0.1",
+    "eslint": "^8.57.0",
     "eslint-config-parcellab": "0.0.1",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0"
+    "mocha": "^10.7.0",
+    "nyc": "^17.0.0"
   },
   "nyc": {
     "reporter": [
       "lcov",
       "text"
+    ]
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json",
+            "package-lock.json",
+            "lib/"
+          ]
+        }
+      ]
     ]
   }
 }
