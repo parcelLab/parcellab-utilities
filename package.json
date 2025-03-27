@@ -35,6 +35,9 @@
     "mocha": "^10.7.0",
     "nyc": "^17.0.0"
   },
+  "engines": {
+    "node": ">=12.x"
+  },
   "nyc": {
     "reporter": [
       "lcov",
