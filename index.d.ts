@@ -3,6 +3,7 @@ type Extra = {
     filename?: string,
     trace_id?: string,
     database_id?: string | number,
+    extrasIndexed?: Record<string, string | number>,
 } & Record<string, unknown>
 
 declare function logToConsole(
