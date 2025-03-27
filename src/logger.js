@@ -209,7 +209,13 @@ function logToConsole(type, sender, msgShort, _extras) {
       if (extras.filename) smallExtras.filename = extras.filename
       if (extras.trace_id) smallExtras.trace_id = String(extras.trace_id)
       if (extras.database_id) smallExtras.database_id = String(extras.database_id)
-      if (extras.extrasIndexed && isPlainObject(extras.extrasIndexed)) Object.assign(smallExtras, extras.extrasIndexed)
+      if (extras.extrasIndexed && isPlainObject(extras.extrasIndexed)) {
+        Object.entries(extras.extrasIndexed).forEach(([key, value]) => {
+          if (typeof value === 'string' || typeof value === 'number') {
+            smallExtras[key] = value
+          }
+        })
+      }
     } catch (error) {
       logToConsole('ERROR', 'logger', `Failed to create smallExtras. ${error}`)
     }
