@@ -171,6 +171,10 @@ function logLocal(type, sender, msgShort, extras) {
   }
 }
 
+function isPlainObject(value) {
+  return Object.prototype.toString.call(value) === '[object Object]'
+}
+
 /**
  * logs to console with timestamp
  * @param  {String} type type of message
@@ -199,20 +203,33 @@ function logToConsole(type, sender, msgShort, _extras) {
 
     // smallExtras added because just sending the extras json can lead to trouble with indexing on the graylog server if it's not consistent
     const smallExtras = { sender, type }
-    if (extras.user_id) smallExtras.user_id = Number(extras.user_id) || 0
-    if (extras.userId && !smallExtras.user_id) smallExtras.user_id = Number(extras.userId) || 0
-    if (extras.filename) smallExtras.filename = extras.filename
-    if (extras.trace_id) smallExtras.trace_id = String(extras.trace_id)
-    if (extras.database_id) smallExtras.database_id = String(extras.database_id)
+    try {
+      if (extras.user_id) smallExtras.user_id = Number(extras.user_id) || 0
+      if (extras.userId && !smallExtras.user_id) smallExtras.user_id = Number(extras.userId) || 0
+      if (extras.filename) smallExtras.filename = extras.filename
+      if (extras.trace_id) smallExtras.trace_id = String(extras.trace_id)
+      if (extras.database_id) smallExtras.database_id = String(extras.database_id)
+      if (extras.extrasIndexed && isPlainObject(extras.extrasIndexed)) {
+        Object.entries(extras.extrasIndexed).forEach(([key, value]) => {
+          if (typeof value === 'string' || typeof value === 'number') {
+            smallExtras[key] = value
+          }
+        })
+      }
+    } catch (error) {
+      const msg = '!!! Failed to create smallExtras.'
+      if (!msgShort.startsWith(msg)) logToConsole('ERROR', 'logger', `${msg} ${error}`)
+      console.error(msg, error)
+    }
 
-    // limit size of msgLong to avoid excessive storage consumtion and failures
+    // limit size of msgLong to avoid excessive storage consumption and failures
     // (up to 32766 byte strings should be possible, but 10k characters is already plenty for reasonable logging output)
     const msgLongGray = (typeof msgLong === 'string' ? msgLong.substring(0, 10000) : null)
 
     try {
       const leveledLogFunction = logger.graylogger[type.toLowerCase()] || logger.graylogger.info
-      const bindedLogFunction = leveledLogFunction.bind(logger.graylogger)
-      bindedLogFunction(msgShort, msgLongGray, smallExtras)
+      const boundLogFunction = leveledLogFunction.bind(logger.graylogger)
+      boundLogFunction(msgShort, msgLongGray, smallExtras)
     } catch (e) {
       logLocal(
         'error',
