@@ -23,8 +23,24 @@ const logger = {
   graylogger: null,
 }
 
+const logLevel = {
+  TRACE: 'TRACE',
+  DEBUG: 'DEBUG',
+  INFO: 'INFO',
+  WARN: 'WARN',
+  ERROR: 'ERROR',
+  CRITICAL: 'CRITICAL',
+}
+
 // order is important! (severe ==> verbose)
-const logLevels = ['CRITICAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE']
+const logLevelsSorted = [
+  logLevel.CRITICAL,
+  logLevel.ERROR,
+  logLevel.WARN,
+  logLevel.INFO,
+  logLevel.DEBUG,
+  logLevel.TRACE,
+]
 
 //to enable logger instances have a default sender - shit's mainly singletonic otherwise
 class Logger {
@@ -32,12 +48,12 @@ class Logger {
     this.defaultSender = defaultSender
   }
 
-  critical(msg, extra, sender) { this.loggerPassToConsole('CRITICAL', sender, msg, extra) }
-  error(msg, extra, sender) { this.loggerPassToConsole('ERROR', sender, msg, extra) }
-  warn(msg, extra, sender) { this.loggerPassToConsole('WARN', sender, msg, extra) }
-  info(msg, extra, sender) { this.loggerPassToConsole('INFO', sender, msg, extra) }
-  debug(msg, extra, sender) { this.loggerPassToConsole('DEBUG', sender, msg, extra) }
-  trace(msg, extra, sender) { this.loggerPassToConsole('TRACE', sender, msg, extra) }
+  critical(msg, extra, sender) { this.loggerPassToConsole(logLevel.CRITICAL, sender, msg, extra) }
+  error(msg, extra, sender) { this.loggerPassToConsole(logLevel.ERROR, sender, msg, extra) }
+  warn(msg, extra, sender) { this.loggerPassToConsole(logLevel.WARN, sender, msg, extra) }
+  info(msg, extra, sender) { this.loggerPassToConsole(logLevel.INFO, sender, msg, extra) }
+  debug(msg, extra, sender) { this.loggerPassToConsole(logLevel.DEBUG, sender, msg, extra) }
+  trace(msg, extra, sender) { this.loggerPassToConsole(logLevel.TRACE, sender, msg, extra) }
 
   loggerPassToConsole(type, sender, msg, extra) {
     sender = sender || this.defaultSender || logger.settings.defaultSender || 'unknown sender'
@@ -86,12 +102,12 @@ const colors = {
 const colorConf = {
   'timestamp': colors.Dim + colors.FgBlack + colors.BgWhite,
   'level': {
-    'TRACE': colors.Dim + colors.BgMagenta + colors.FgBlack,
-    'DEBUG': colors.Dim + colors.FgBlack + colors.BgGreen,
-    'INFO': colors.FgBlue + colors.BgCyan,
-    'WARN': colors.Bright + colors.FgYellow + colors.BgBlack + ' ⚠️ ',
-    'ERROR': colors.Bright + colors.FgRed + colors.BgBlack + ' ❌',
-    'CRITICAL': colors.Bright + colors.BgRed + colors.FgYellow + colors.Blink + ' ☠️ ',
+    [logLevel.TRACE]: colors.Dim + colors.BgMagenta + colors.FgBlack,
+    [logLevel.DEBUG]: colors.Dim + colors.FgBlack + colors.BgGreen,
+    [logLevel.INFO]: colors.FgBlue + colors.BgCyan,
+    [logLevel.WARN]: colors.Bright + colors.FgYellow + colors.BgBlack + ' ⚠️ ',
+    [logLevel.ERROR]: colors.Bright + colors.FgRed + colors.BgBlack + ' ❌',
+    [logLevel.CRITICAL]: colors.Bright + colors.BgRed + colors.FgYellow + colors.Blink + ' ☠️ ',
   },
   'sender': colors.Underscore + colors.FgCyan,
   'extra': colors.FgWhite + colors.BgBlue,
@@ -103,7 +119,7 @@ function objToString(obj) {
     if (!logger.settings.prettyPrint) { str = JSON.stringify(obj) }
     else { str = JSON.stringify(obj, null, 4) }
   } catch (err) {
-    logToConsole('WARN', 'logger-module', 'stringification of object failed', err)
+    logToConsole(logLevel.WARN, 'logger-module', 'stringification of object failed', err)
     str = '~(Obj)~[un-stringifiable]~~'
   }
   return str
@@ -143,19 +159,19 @@ logger.initGraylog = function () {
     console.error(' 👾 !ERROR! while trying to write to graylog2:', error)
   })
   logger.graylogger = graylogger
-  logToConsole('INFO', 'logger.initGraylog', 'Connection to Graylog log Server initialized', options)
+  logToConsole(logLevel.INFO, 'logger.initGraylog', 'Connection to Graylog log Server initialized', options)
   //if (logger.settings.verboseLocal) console.log(logger)
 }
 
 function checkType(type) {
-  if (logLevels.indexOf(type) !== -1) return true
+  if (logLevelsSorted.indexOf(type) !== -1) return true
   console.error(`unknown logging type: "${type}"`)
-  console.info(`known logging types are: ${logLevels.join(', ')}`)
+  console.info(`known logging types are: ${logLevelsSorted.join(', ')}`)
   return false
 }
 
 function logThis(type) {
-  return logLevels.indexOf(logger.settings.level.toUpperCase()) >= logLevels.indexOf(type)
+  return logLevelsSorted.indexOf(logger.settings.level.toUpperCase()) >= logLevelsSorted.indexOf(type)
 }
 
 function logLocal(type, sender, msgShort, extras) {
@@ -245,8 +261,15 @@ function logToConsole(type, sender, msgShort, _extras) {
   }
 }
 
+logToConsole.TRACE = logLevel.TRACE
+logToConsole.DEBUG = logLevel.DEBUG
+logToConsole.INFO = logLevel.INFO
+logToConsole.WARN = logLevel.WARN
+logToConsole.ERROR = logLevel.ERROR
+logToConsole.CRITICAL = logLevel.CRITICAL
 
 export {
   logToConsole,
   logger as Logger,
+  logLevel,
 }
