@@ -22,7 +22,7 @@
   "dependencies": {
     "countryjs": "github:parcellab/countryjs",
     "graylog2": "^0.2.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.26.4",
